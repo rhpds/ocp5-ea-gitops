@@ -42,23 +42,21 @@ spec:
 {{- end }}
 
               # Generate a Cluster Registration Secret (CRS) via the Central API
+              # The API returns a base64-encoded YAML Secret document in the 'crs' field
               CRS_RESPONSE=$(curl -sk -u "admin:${PASSWORD}" \
                 -X POST https://central.${NAMESPACE}.svc:443/v1/cluster-init/crs \
                 -H "Content-Type: application/json" \
                 -d '{"name":"{{ .Values.clusterName }}"}')
 
-              # Extract the CRS value
-              CRS_VALUE=$(echo "$CRS_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['crs'])" 2>/dev/null)
-
-              if [ -z "$CRS_VALUE" ]; then
-                echo "ERROR: Failed to generate CRS"
-                echo "$CRS_RESPONSE"
-                exit 1
-              fi
-
-              # Create the cluster-registration-secret
-              oc create secret generic cluster-registration-secret \
-                --from-literal=crs="$CRS_VALUE" \
-                -n "${NAMESPACE}"
+              # Decode the CRS YAML and apply it
+              echo "$CRS_RESPONSE" | python3 -c "
+              import sys, json, base64
+              d = json.load(sys.stdin)
+              if 'crs' not in d:
+                  print('ERROR: Failed to generate CRS')
+                  print(json.dumps(d, indent=2))
+                  sys.exit(1)
+              print(base64.b64decode(d['crs']).decode())
+              " | oc apply -n "${NAMESPACE}" -f -
 
               echo "Cluster registration secret created successfully"
