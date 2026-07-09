@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: init-bundle-generator
+  name: cluster-registration-secret-generator
   namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "3"
@@ -11,10 +11,10 @@ metadata:
 spec:
   template:
     spec:
-      serviceAccountName: init-bundle-generator
+      serviceAccountName: cluster-registration-secret-generator
       restartPolicy: OnFailure
       containers:
-        - name: init-bundle
+        - name: crs-generator
           image: registry.redhat.io/openshift4/ose-cli:latest
           command: ["/bin/bash", "-c"]
           args:
@@ -28,6 +28,12 @@ spec:
               done
               echo "Central is ready"
 
+              # Check if cluster-registration-secret already exists
+              if oc get secret cluster-registration-secret -n "${NAMESPACE}" &>/dev/null; then
+                echo "Cluster registration secret already exists, skipping"
+                exit 0
+              fi
+
               # Get admin password
 {{- if .Values.adminPassword }}
               PASSWORD=$(oc get secret central-admin-password -n "${NAMESPACE}" -o jsonpath='{.data.password}' | base64 -d)
@@ -35,23 +41,39 @@ spec:
               PASSWORD=$(oc get secret central-htpasswd -n "${NAMESPACE}" -o jsonpath='{.data.password}' | base64 -d)
 {{- end }}
 
-              # Check if init bundle already exists
-              EXISTING=$(curl -sk -u "admin:${PASSWORD}" \
-                https://central.${NAMESPACE}.svc:443/v1/cluster-init/init-bundles | \
-                python3 -c "import sys,json; bundles=json.load(sys.stdin).get('items',[]); print('exists' if any(b['name']=='local-cluster' for b in bundles) else 'none')" 2>/dev/null)
+              # Generate a Cluster Registration Secret (CRS) via the Central API
+              CRS=$(curl -sk -u "admin:${PASSWORD}" \
+                -X POST https://central.${NAMESPACE}.svc:443/v1/cluster-init/cluster-registration-secrets \
+                -H "Content-Type: application/json" \
+                -d '{"name":"{{ .Values.clusterName }}"}')
 
-              if [ "$EXISTING" = "exists" ]; then
-                echo "Init bundle 'local-cluster' already exists, skipping"
-                exit 0
+              # Check for errors
+              if echo "$CRS" | python3 -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if 'crs' in d else 1)" 2>/dev/null; then
+                echo "CRS generated successfully"
+              else
+                echo "ERROR: Failed to generate CRS"
+                echo "$CRS"
+                exit 1
               fi
 
-              # Generate init bundle
-              BUNDLE=$(curl -sk -u "admin:${PASSWORD}" \
-                -X POST https://central.${NAMESPACE}.svc:443/v1/cluster-init/init-bundles \
-                -H "Content-Type: application/json" \
-                -d '{"name":"local-cluster"}')
+              # Extract the CRS YAML and apply it
+              echo "$CRS" | python3 -c "
+              import sys, json, yaml
+              data = json.load(sys.stdin)
+              crs_value = data['crs']
+              secret = {
+                'apiVersion': 'v1',
+                'kind': 'Secret',
+                'metadata': {
+                  'name': 'cluster-registration-secret',
+                  'namespace': '${NAMESPACE}'
+                },
+                'type': 'Opaque',
+                'stringData': {
+                  'crs': crs_value
+                }
+              }
+              print(yaml.dump(secret, default_flow_style=False))
+              " | oc apply -n "${NAMESPACE}" -f -
 
-              # Extract and apply the kubectl bundle
-              echo "$BUNDLE" | python3 -c "import sys,json,base64; print(base64.b64decode(json.load(sys.stdin)['kubectlBundle']).decode())" | oc apply -n "${NAMESPACE}" -f -
-
-              echo "Init bundle applied successfully"
+              echo "Cluster registration secret applied successfully"
