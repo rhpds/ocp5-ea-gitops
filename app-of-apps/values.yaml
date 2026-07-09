@@ -23,6 +23,6 @@ common:
 acs:
   enabled: true
   name: acs
-  namespace: stackrox
+  namespace: acs
   clusterName: local-cluster
   adminPassword: ""

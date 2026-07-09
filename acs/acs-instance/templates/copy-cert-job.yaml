@@ -3,7 +3,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: copy-ingress-cert
-  namespace: stackrox
+  namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "1"
     argocd.argoproj.io/hook: Sync
@@ -19,10 +19,11 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-              echo "Copying default ingress certificate to stackrox namespace..."
+              NAMESPACE="{{ .Release.Namespace }}"
+              echo "Copying default ingress certificate to ${NAMESPACE} namespace..."
 
               # Check if the target secret already exists
-              if oc get secret central-default-tls-cert -n stackrox &>/dev/null; then
+              if oc get secret central-default-tls-cert -n "${NAMESPACE}" &>/dev/null; then
                 echo "Secret central-default-tls-cert already exists, skipping"
                 exit 0
               fi
@@ -47,10 +48,10 @@ spec:
                 exit 1
               fi
 
-              # Create the TLS secret in stackrox namespace
+              # Create the TLS secret
               oc create secret tls central-default-tls-cert \
                 --cert=<(echo "$TLS_CRT" | base64 -d) \
                 --key=<(echo "$TLS_KEY" | base64 -d) \
-                -n stackrox
+                -n "${NAMESPACE}"
 
               echo "Certificate copied successfully"

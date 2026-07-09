@@ -3,13 +3,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: init-bundle-generator
-  namespace: stackrox
+  namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "3"
 subjects:
   - kind: ServiceAccount
     name: init-bundle-generator
-    namespace: stackrox
+    namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
   name: init-bundle-generator

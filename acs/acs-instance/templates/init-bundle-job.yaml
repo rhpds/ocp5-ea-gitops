@@ -3,7 +3,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: init-bundle-generator
-  namespace: stackrox
+  namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "3"
     argocd.argoproj.io/hook: Sync
@@ -19,9 +19,10 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
+              NAMESPACE="{{ .Release.Namespace }}"
               # Wait for Central to be ready
               echo "Waiting for Central..."
-              until curl -sk https://central.stackrox.svc:443/v1/ping; do
+              until curl -sk https://central.${NAMESPACE}.svc:443/v1/ping; do
                 echo "Central not ready, retrying in 10s..."
                 sleep 10
               done
@@ -29,14 +30,14 @@ spec:
 
               # Get admin password
 {{- if .Values.adminPassword }}
-              PASSWORD=$(oc get secret central-admin-password -n stackrox -o jsonpath='{.data.password}' | base64 -d)
+              PASSWORD=$(oc get secret central-admin-password -n "${NAMESPACE}" -o jsonpath='{.data.password}' | base64 -d)
 {{- else }}
-              PASSWORD=$(oc get secret central-htpasswd -n stackrox -o jsonpath='{.data.password}' | base64 -d)
+              PASSWORD=$(oc get secret central-htpasswd -n "${NAMESPACE}" -o jsonpath='{.data.password}' | base64 -d)
 {{- end }}
 
               # Check if init bundle already exists
               EXISTING=$(curl -sk -u "admin:${PASSWORD}" \
-                https://central.stackrox.svc:443/v1/cluster-init/init-bundles | \
+                https://central.${NAMESPACE}.svc:443/v1/cluster-init/init-bundles | \
                 python3 -c "import sys,json; bundles=json.load(sys.stdin).get('items',[]); print('exists' if any(b['name']=='local-cluster' for b in bundles) else 'none')" 2>/dev/null)
 
               if [ "$EXISTING" = "exists" ]; then
@@ -46,11 +47,11 @@ spec:
 
               # Generate init bundle
               BUNDLE=$(curl -sk -u "admin:${PASSWORD}" \
-                -X POST https://central.stackrox.svc:443/v1/cluster-init/init-bundles \
+                -X POST https://central.${NAMESPACE}.svc:443/v1/cluster-init/init-bundles \
                 -H "Content-Type: application/json" \
                 -d '{"name":"local-cluster"}')
 
               # Extract and apply the kubectl bundle
-              echo "$BUNDLE" | python3 -c "import sys,json,base64; print(base64.b64decode(json.load(sys.stdin)['kubectlBundle']).decode())" | oc apply -n stackrox -f -
+              echo "$BUNDLE" | python3 -c "import sys,json,base64; print(base64.b64decode(json.load(sys.stdin)['kubectlBundle']).decode())" | oc apply -n "${NAMESPACE}" -f -
 
               echo "Init bundle applied successfully"
