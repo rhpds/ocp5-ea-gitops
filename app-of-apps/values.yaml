@@ -5,6 +5,7 @@ gitops:
 argocd:
   namespace: openshift-gitops
 
+# Placeholder for future operator version pinning via frozen OLM catalog snapshot
 catalogSource:
   enabled: false
   name: redhat-operators-snapshot
