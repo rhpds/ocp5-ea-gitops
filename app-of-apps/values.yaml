@@ -1,0 +1,27 @@
+gitops:
+  repoURL: https://github.com/rhpds/ocp5-ea-gitops.git
+  targetRevision: main
+
+argocd:
+  namespace: openshift-gitops
+
+catalogSource:
+  enabled: false
+  name: redhat-operators-snapshot
+  namespace: openshift-marketplace
+  image: quay.io/gpte-devops-automation/olm_snapshot_redhat_catalog
+  tag: v4.20_2026_02_11
+
+cluster:
+  subdomain: ""
+  apiServer: ""
+
+common:
+  password: ""
+
+acs:
+  enabled: true
+  name: acs
+  namespace: stackrox
+  clusterName: local-cluster
+  adminPassword: ""
