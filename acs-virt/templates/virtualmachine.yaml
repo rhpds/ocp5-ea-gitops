@@ -32,3 +32,12 @@ spec:
         - dataVolume:
             name: {{ .Values.vm.name }}-rootdisk
           name: rootdisk
+        - cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: {{ .Values.vm.user }}
+              password: {{ .Values.vm.password }}
+              chpasswd:
+                expire: false
+              ssh_pwauth: true
+          name: cloudinitdisk

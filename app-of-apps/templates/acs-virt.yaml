@@ -11,5 +11,9 @@ spec:
     path: acs-virt
     repoURL: {{ .Values.gitops.repoURL }}
     targetRevision: {{ .Values.gitops.targetRevision }}
+    helm:
+      valuesObject:
+        vm:
+          password: {{ .Values.common.password }}
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}

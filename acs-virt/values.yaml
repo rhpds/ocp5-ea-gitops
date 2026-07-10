@@ -4,6 +4,8 @@ vm:
   preference: rhel.9
   diskSize: 30Gi
   running: true
+  user: cloud-user
+  password: ""
 
 bootSource:
   name: rhel9
