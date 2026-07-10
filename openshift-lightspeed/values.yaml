@@ -1,5 +1,5 @@
 subscription:
-  channel: stable-1.1
+  channel: stable
   installPlanApproval: Automatic
   name: lightspeed-operator
   source: redhat-operators
