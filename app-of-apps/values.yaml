@@ -37,6 +37,12 @@ clusterObservability:
   name: cluster-observability
   namespace: openshift-operators
 
+openshiftMcpServer:
+  enabled: true
+  name: openshift-mcp-server
+  namespace: openshift-mcp-server
+  chartVersion: 0.3.0
+
 openshiftLightspeed:
   enabled: true
   name: openshift-lightspeed
