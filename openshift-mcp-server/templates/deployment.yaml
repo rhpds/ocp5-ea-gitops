@@ -17,6 +17,10 @@ spec:
         app: {{ .Values.name }}
     spec:
       serviceAccountName: {{ .Values.name }}
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: {{ .Values.name }}
           image: {{ .Values.image }}
@@ -24,6 +28,10 @@ spec:
           args: ["--config", "/etc/mcp/config.toml"]
           ports:
             - containerPort: 8080
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - name: mcp-config
               mountPath: /etc/mcp
