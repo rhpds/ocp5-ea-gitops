@@ -4,6 +4,9 @@ clusterName: local-cluster
 
 adminPassword: ""
 
+vmScanning:
+  enabled: true
+
 argocd:
   enabled: true
   syncwave: "2"

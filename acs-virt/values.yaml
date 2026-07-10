@@ -6,6 +6,7 @@ vm:
   running: true
   user: cloud-user
   password: ""
+  roxagentVersion: "4.11.1"
 
 bootSource:
   name: rhel9

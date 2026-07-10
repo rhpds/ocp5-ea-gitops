@@ -28,7 +28,8 @@ spec:
     spec:
       evictionStrategy: None
       domain:
-        devices: {}
+        devices:
+          autoattachVSOCK: true
       volumes:
         - dataVolume:
             name: {{ .Values.vm.name }}-rootdisk
@@ -41,4 +42,9 @@ spec:
               chpasswd:
                 expire: false
               ssh_pwauth: true
+              runcmd:
+                - dnf update -y --security --nobest || true
+                - curl -sSfL https://mirror.openshift.com/pub/rhacs/assets/{{ .Values.vm.roxagentVersion }}/bin/linux/roxagent -o /usr/local/bin/roxagent
+                - chmod +x /usr/local/bin/roxagent
+                - sudo /usr/local/bin/roxagent --daemon
           name: cloudinitdisk

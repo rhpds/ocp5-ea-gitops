@@ -24,6 +24,12 @@ spec:
     persistence:
       persistentVolumeClaim:
         claimName: stackrox-db
+{{- if .Values.vmScanning.enabled }}
+  customize:
+    envVars:
+      - name: ROX_VIRTUAL_MACHINES
+        value: "true"
+{{- end }}
   egress:
     connectivityPolicy: Online
   scanner:

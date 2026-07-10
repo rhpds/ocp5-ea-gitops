@@ -17,3 +17,9 @@ spec:
       collection: EBPF
       imageFlavor: Regular
     taintToleration: TolerateTaints
+{{- if .Values.vmScanning.enabled }}
+  customize:
+    envVars:
+      - name: ROX_VIRTUAL_MACHINES
+        value: "true"
+{{- end }}
