@@ -41,7 +41,7 @@ openshiftMcpServer:
   enabled: true
   name: openshift-mcp-server
   namespace: openshift-mcp-server
-  chartVersion: 0.3.0
+  chartVersion: 0.2.0
 
 openshiftLightspeed:
   enabled: true

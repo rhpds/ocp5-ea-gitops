@@ -8,8 +8,8 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    chart: openshift-mcp-server
-    repoURL: ghcr.io/openshift/charts
+    chart: redhat-openshift-mcp-server
+    repoURL: https://charts.openshift.io
     targetRevision: {{ .Values.openshiftMcpServer.chartVersion }}
     helm:
       valuesObject:
