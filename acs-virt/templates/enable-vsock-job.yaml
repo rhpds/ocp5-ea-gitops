@@ -36,7 +36,7 @@ spec:
               fi
 
               echo "Enabling VSOCK feature gate..."
-              oc patch hyperconverged kubevirt-hyperconverged -n openshift-cnv --type=json -p \
-                '[{"op":"add","path":"/spec/configuration/developerConfiguration/featureGates/-","value":"VSOCK"}]'
+              oc patch hyperconverged kubevirt-hyperconverged -n openshift-cnv --type=merge -p \
+                '{"spec":{"configuration":{"developerConfiguration":{"featureGates":["VSOCK"]}}}}'
 
               echo "VSOCK feature gate enabled"
