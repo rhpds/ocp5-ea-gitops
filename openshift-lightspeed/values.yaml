@@ -1,0 +1,16 @@
+subscription:
+  channel: stable-1.1
+  installPlanApproval: Automatic
+  name: lightspeed-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  namespace: openshift-lightspeed
+
+llm:
+  apiUrl: ""
+  apiKey: ""
+  provider: openai
+  model: qwen3-235b
+
+featureGates:
+  - MCPServer

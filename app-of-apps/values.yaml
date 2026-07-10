@@ -36,3 +36,13 @@ clusterObservability:
   enabled: true
   name: cluster-observability
   namespace: openshift-operators
+
+openshiftLightspeed:
+  enabled: true
+  name: openshift-lightspeed
+  namespace: openshift-lightspeed
+  llm:
+    apiUrl: ""
+    apiKey: ""
+    provider: openai
+    model: qwen3-235b
