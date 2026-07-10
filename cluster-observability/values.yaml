@@ -1,5 +1,5 @@
 subscription:
-  channel: stable-1.5
+  channel: stable
   installPlanApproval: Automatic
   name: cluster-observability-operator
   source: redhat-operators
