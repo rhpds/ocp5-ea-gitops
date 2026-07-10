@@ -1,0 +1,10 @@
+vm:
+  name: rhel9-vm
+  instanceType: u1.medium
+  preference: rhel.9
+  diskSize: 30Gi
+  running: true
+
+bootSource:
+  name: rhel9
+  namespace: openshift-virtualization-os-images

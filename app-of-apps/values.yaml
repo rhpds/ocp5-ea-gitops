@@ -26,3 +26,8 @@ acs:
   namespace: acs
   clusterName: local-cluster
   adminPassword: ""
+
+acsVirt:
+  enabled: true
+  name: acs-virt
+  namespace: acs-virt
