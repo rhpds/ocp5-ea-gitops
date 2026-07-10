@@ -12,7 +12,6 @@ spec:
   preference:
     name: {{ .Values.vm.preference }}
   running: {{ .Values.vm.running }}
-  evictionStrategy: None
   dataVolumeTemplates:
     - metadata:
         name: {{ .Values.vm.name }}-rootdisk
@@ -27,6 +26,7 @@ spec:
               storage: {{ .Values.vm.diskSize }}
   template:
     spec:
+      evictionStrategy: None
       domain:
         devices: {}
       volumes:
