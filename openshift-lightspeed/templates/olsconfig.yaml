@@ -30,6 +30,4 @@ spec:
       postgres:
         sharedBuffers: 256MB
         maxConnections: 2000
-    deployment:
-      replicas: 1
 {{- end }}
