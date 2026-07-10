@@ -15,6 +15,11 @@ llm:
 featureGates:
   - MCPServer
 
+mcpServer:
+  name: openshift-mcp
+  url: http://openshift-mcp-server.openshift-mcp.svc.cluster.local:8080/mcp
+  timeout: 120
+
 # TEMPORARY: Custom MCP server image for Perses integration
 mcpImagePatch:
   csvName: lightspeed-operator.v1.1.1

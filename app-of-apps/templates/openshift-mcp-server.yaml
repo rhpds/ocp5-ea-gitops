@@ -8,12 +8,8 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    chart: redhat-openshift-mcp-server
-    repoURL: https://charts.openshift.io
-    targetRevision: {{ .Values.openshiftMcpServer.chartVersion }}
-    helm:
-      valuesObject:
-        ingress:
-          host: {{ .Values.openshiftMcpServer.name }}.{{ .Values.cluster.subdomain }}
+    path: openshift-mcp-server
+    repoURL: {{ .Values.gitops.repoURL }}
+    targetRevision: {{ .Values.gitops.targetRevision }}
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}
