@@ -14,3 +14,8 @@ llm:
 
 featureGates:
   - MCPServer
+
+# TEMPORARY: Custom MCP server image for Perses integration
+mcpImagePatch:
+  csvName: lightspeed-operator.v1.1.1
+  image: quay.io/tremes/ocp-mcp
