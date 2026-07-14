@@ -29,6 +29,10 @@ spec:
     envVars:
       - name: ROX_VIRTUAL_MACHINES
         value: "true"
+      - name: ROX_INIT_CONTAINER_SUPPORT
+        value: "true"
+      - name: ROX_POLICY_FILTERS_UI
+        value: "true"
 {{- end }}
   egress:
     connectivityPolicy: Online
