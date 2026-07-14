@@ -12,6 +12,7 @@ metadata:
 spec:
   type: OpenAI
   openAI:
+    url: {{ .Values.llm.apiUrl | quote }}
     credentialsSecret:
       name: llm-creds-openai
 {{- end }}
