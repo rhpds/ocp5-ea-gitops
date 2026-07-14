@@ -1,0 +1,165 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: roxagent-setup
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      serviceAccountName: roxagent-setup
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: setup
+          image: registry.redhat.io/openshift4/ose-cli:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              VM_NAME="{{ .Values.vm.name }}"
+              VM_NS="{{ .Release.Namespace }}"
+              VM_USER="{{ .Values.vm.user }}"
+              ROXAGENT_VERSION="{{ .Values.vm.roxagentVersion }}"
+              ROXAGENT_URL="https://mirror.openshift.com/pub/rhacs/assets/${ROXAGENT_VERSION}/bin/linux/roxagent"
+
+              # ── Step 1: Download and install virtctl ──
+              echo "Downloading virtctl from ConsoleCLIDownload..."
+              VIRTCTL_URL=$(oc get consoleclidownload virtctl-clidownloads-kubevirt-hyperconverged \
+                -o jsonpath='{.spec.links[?(@.text=="Download virtctl for Linux for x86_64")].href}' 2>/dev/null || true)
+
+              if [ -z "$VIRTCTL_URL" ]; then
+                echo "ERROR: ConsoleCLIDownload not available"
+                exit 1
+              fi
+
+              curl -fsSL -k "$VIRTCTL_URL" | tar xz -C /tmp virtctl
+              chmod +x /tmp/virtctl
+              echo "virtctl installed"
+
+              # ── Step 2: Wait for VM to be ready ──
+              echo "Waiting for VM ${VM_NAME} to be ready..."
+              for i in $(seq 1 60); do
+                if oc get vmi "${VM_NAME}" -n "${VM_NS}" -o jsonpath='{.status.phase}' 2>/dev/null | grep -q Running; then
+                  echo "VM is running"
+                  break
+                fi
+                echo "  VM not ready, retrying in 10s... ($i/60)"
+                sleep 10
+              done
+
+              # Wait a bit more for SSH to be available
+              echo "Waiting for SSH connectivity..."
+              for i in $(seq 1 30); do
+                if /tmp/virtctl ssh "${VM_USER}@${VM_NAME}" -n "${VM_NS}" -t 5 \
+                  --local-ssh-opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+                  -c "echo ok" 2>/dev/null | grep -q ok; then
+                  echo "SSH is ready"
+                  break
+                fi
+                echo "  SSH not ready, retrying in 10s... ($i/30)"
+                sleep 10
+              done
+
+              # ── Step 3: Download roxagent binary onto the VM ──
+              echo "Installing roxagent ${ROXAGENT_VERSION} on VM..."
+              /tmp/virtctl ssh "${VM_USER}@${VM_NAME}" -n "${VM_NS}" -t 30 \
+                --local-ssh-opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+                -c "sudo curl -sSfL '${ROXAGENT_URL}' -o /usr/local/bin/roxagent && \
+                    sudo chmod 755 /usr/local/bin/roxagent && \
+                    sudo restorecon -v /usr/local/bin/roxagent 2>/dev/null || true && \
+                    echo 'roxagent binary installed'"
+
+              # ── Step 4: Create systemd units ──
+              echo "Creating systemd units..."
+
+              # roxagent-prep.service
+              /tmp/virtctl ssh "${VM_USER}@${VM_NAME}" -n "${VM_NS}" -t 30 \
+                --local-ssh-opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+                -c "sudo tee /etc/systemd/system/roxagent-prep.service > /dev/null << 'UNIT'
+              [Unit]
+              Description=Prepare native StackRox VM Agent inputs
+
+              [Service]
+              Type=oneshot
+              RemainAfterExit=yes
+              ExecStartPre=/bin/rm -rf /tmp/roxroot
+              ExecStartPre=/bin/mkdir -p /tmp/roxroot/etc/pki/entitlement
+              ExecStartPre=/bin/mkdir -p /tmp/roxroot/etc/yum.repos.d /tmp/roxroot/etc/yum/repos.d /tmp/roxroot/etc/distro.repos.d
+              ExecStartPre=/bin/mkdir -p /tmp/roxroot/var/lib/dnf
+              ExecStartPre=/bin/mkdir -p /tmp/roxroot/var/cache/dnf
+              ExecStartPre=/bin/mkdir -p /run/lock/roxagent
+              ExecStartPre=/bin/touch /tmp/roxroot/etc/os-release /tmp/roxroot/etc/redhat-release /tmp/roxroot/etc/system-release-cpe
+              ExecStart=/bin/rm -rf /tmp/roxagent-rpm
+              ExecStart=/bin/cp -a /var/lib/rpm /tmp/roxagent-rpm
+              ExecStart=/bin/chmod -R 755 /tmp/roxagent-rpm
+              UNIT"
+
+              # roxagent.service
+              /tmp/virtctl ssh "${VM_USER}@${VM_NAME}" -n "${VM_NS}" -t 30 \
+                --local-ssh-opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+                -c "sudo tee /etc/systemd/system/roxagent.service > /dev/null << 'UNIT'
+              [Unit]
+              Description=StackRox VM Agent (native)
+              After=network.target roxagent-prep.service
+              Requires=roxagent-prep.service
+
+              [Service]
+              Type=oneshot
+              User=root
+              BindPaths=/tmp/roxagent-rpm:/tmp/roxroot/var/lib/rpm
+              BindReadOnlyPaths=/etc/os-release:/tmp/roxroot/etc/os-release
+              BindReadOnlyPaths=/etc/redhat-release:/tmp/roxroot/etc/redhat-release
+              BindReadOnlyPaths=/etc/system-release-cpe:/tmp/roxroot/etc/system-release-cpe
+              BindReadOnlyPaths=/etc/yum.repos.d:/tmp/roxroot/etc/yum.repos.d
+              BindReadOnlyPaths=/var/cache/dnf:/tmp/roxroot/var/cache/dnf
+              BindReadOnlyPaths=/var/lib/dnf:/tmp/roxroot/var/lib/dnf
+              ExecStart=/usr/local/bin/roxagent --host-path /tmp/roxroot
+              StandardOutput=journal
+              StandardError=journal
+              UNIT"
+
+              # roxagent.timer
+              /tmp/virtctl ssh "${VM_USER}@${VM_NAME}" -n "${VM_NS}" -t 30 \
+                --local-ssh-opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+                -c "sudo tee /etc/systemd/system/roxagent.timer > /dev/null << 'UNIT'
+              [Unit]
+              Description=Run StackRox VM Agent periodically
+
+              [Timer]
+              OnBootSec=5min
+              OnUnitActiveSec=3h40m
+              RandomizedDelaySec=40min
+              Persistent=true
+
+              [Install]
+              WantedBy=timers.target
+              UNIT"
+
+              # ── Step 5: Restore SELinux contexts and enable timer ──
+              echo "Enabling roxagent systemd units..."
+              /tmp/virtctl ssh "${VM_USER}@${VM_NAME}" -n "${VM_NS}" -t 30 \
+                --local-ssh-opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+                -c "sudo restorecon -Rv /etc/systemd/system/roxagent*.service /etc/systemd/system/roxagent.timer 2>/dev/null || true && \
+                    sudo systemctl daemon-reload && \
+                    sudo systemctl enable --now roxagent.timer && \
+                    echo 'roxagent timer enabled'"
+
+              # ── Step 6: Trigger immediate first scan ──
+              echo "Triggering initial roxagent scan..."
+              /tmp/virtctl ssh "${VM_USER}@${VM_NAME}" -n "${VM_NS}" -t 120 \
+                --local-ssh-opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+                -c "sudo systemctl start roxagent.service && \
+                    echo 'Initial scan completed'"
+
+              echo "roxagent setup complete on VM ${VM_NAME}"

@@ -7,34 +7,46 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  instancetype:
-    name: {{ .Values.vm.instanceType }}
-  preference:
-    name: {{ .Values.vm.preference }}
-  running: {{ .Values.vm.running }}
-  dataVolumeTemplates:
-    - metadata:
-        name: {{ .Values.vm.name }}-rootdisk
-      spec:
-        sourceRef:
-          kind: DataSource
-          name: {{ .Values.bootSource.name }}
-          namespace: {{ .Values.bootSource.namespace }}
-        storage:
-          resources:
-            requests:
-              storage: {{ .Values.vm.diskSize }}
+  runStrategy: Always
   template:
+    metadata:
+      labels:
+        kubevirt.io/domain: {{ .Values.vm.name }}
     spec:
-      evictionStrategy: None
       domain:
+        cpu:
+          cores: 2
+          sockets: 1
+          threads: 1
         devices:
           autoattachVSOCK: true
+          disks:
+            - name: containerdisk
+              bootOrder: 1
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              bootOrder: 2
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+        memory:
+          guest: 4Gi
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: "2"
+      networks:
+        - name: default
+          pod: {}
       volumes:
-        - dataVolume:
-            name: {{ .Values.vm.name }}-rootdisk
-          name: rootdisk
-        - cloudInitNoCloud:
+        - name: containerdisk
+          containerDisk:
+            image: {{ .Values.vm.image }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
             userData: |
               #cloud-config
               user: {{ .Values.vm.user }}
@@ -42,9 +54,3 @@ spec:
               chpasswd:
                 expire: false
               ssh_pwauth: true
-              runcmd:
-                - dnf update -y --security --nobest || true
-                - curl -sSfL https://mirror.openshift.com/pub/rhacs/assets/{{ .Values.vm.roxagentVersion }}/bin/linux/roxagent -o /usr/local/bin/roxagent
-                - chmod +x /usr/local/bin/roxagent
-                - sudo /usr/local/bin/roxagent --daemon
-          name: cloudinitdisk

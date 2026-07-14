@@ -1,13 +1,6 @@
 vm:
   name: rhel9-vm
-  instanceType: u1.medium
-  preference: rhel.9
-  diskSize: 30Gi
-  running: true
+  image: quay.io/rhpds/ocp5-vm-primed:rhel9
   user: cloud-user
   password: ""
   roxagentVersion: "4.11.1"
-
-bootSource:
-  name: rhel9
-  namespace: openshift-virtualization-os-images
