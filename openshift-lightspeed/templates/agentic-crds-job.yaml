@@ -6,7 +6,7 @@ metadata:
   name: agentic-install-crds
   namespace: {{ .Values.subscription.namespace }}
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "4"
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
@@ -15,7 +15,7 @@ spec:
       labels:
         app: agentic-install-crds
     spec:
-      serviceAccountName: patch-mcp-image
+      serviceAccountName: lightspeed-agentic-operator
       restartPolicy: OnFailure
       securityContext:
         runAsNonRoot: true

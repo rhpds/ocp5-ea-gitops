@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: lightspeed-agentic-console-plugin
     app.kubernetes.io/component: console
   annotations:
-    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-wave: "6"
 data:
   nginx.conf: |
     error_log /dev/stdout info;
