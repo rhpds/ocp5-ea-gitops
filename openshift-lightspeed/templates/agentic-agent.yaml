@@ -10,19 +10,12 @@ metadata:
     argocd.argoproj.io/sync-wave: "7"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  llmProvider: openai
-  model: {{ .Values.llm.model }}
-  analysisConfig:
-    timeoutSeconds: 120
-    providerName: openai
-    modelName: {{ .Values.llm.model }}
-  executionConfig:
-    timeoutSeconds: 120
-    providerName: openai
-    modelName: {{ .Values.llm.model }}
-  verificationConfig:
-    timeoutSeconds: 120
-    providerName: openai
-    modelName: {{ .Values.llm.model }}
+  llmProvider:
+    name: openai
+  model: {{ .Values.llm.model | quote }}
+  timeouts:
+    analysisSeconds: 120
+    executionSeconds: 120
+    verificationSeconds: 120
 {{- end }}
 {{- end }}

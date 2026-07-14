@@ -11,8 +11,8 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   type: OpenAI
-  url: {{ .Values.llm.apiUrl }}
-  credentialsSecretRef:
-    name: llm-creds-openai
+  openAI:
+    credentialsSecret:
+      name: llm-creds-openai
 {{- end }}
 {{- end }}
