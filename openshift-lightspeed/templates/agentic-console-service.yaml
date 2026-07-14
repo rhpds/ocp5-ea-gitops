@@ -1,0 +1,19 @@
+{{- if .Values.agentic.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lightspeed-agentic-console-plugin
+  namespace: {{ .Values.subscription.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+    service.beta.openshift.io/serving-cert-secret-name: lightspeed-agentic-console-plugin-cert
+spec:
+  ports:
+    - name: https
+      port: 9443
+      targetPort: 9443
+      protocol: TCP
+  selector:
+    app: lightspeed-agentic-console-plugin
+{{- end }}

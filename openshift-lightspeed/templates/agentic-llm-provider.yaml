@@ -1,0 +1,18 @@
+{{- if .Values.agentic.enabled }}
+{{- if .Values.llm.apiKey }}
+---
+apiVersion: agentic.openshift.io/v1alpha1
+kind: LLMProvider
+metadata:
+  name: openai
+  namespace: {{ .Values.subscription.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  type: OpenAI
+  url: {{ .Values.llm.apiUrl }}
+  credentialsSecretRef:
+    name: llm-creds-openai
+{{- end }}
+{{- end }}
