@@ -18,7 +18,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: setup
-          image: registry.redhat.io/openshift4/ose-cli:latest
+          image: registry.redhat.io/openshift4/ose-cli-rhel9:latest
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -49,27 +49,41 @@ spec:
 
               # ── Step 2: Wait for VM to be ready ──
               echo "Waiting for VM ${VM_NAME} to be ready..."
+              VM_READY=false
               for i in $(seq 1 60); do
                 if oc get vmi "${VM_NAME}" -n "${VM_NS}" -o jsonpath='{.status.phase}' 2>/dev/null | grep -q Running; then
                   echo "VM is running"
+                  VM_READY=true
                   break
                 fi
                 echo "  VM not ready, retrying in 10s... ($i/60)"
                 sleep 10
               done
 
+              if [ "$VM_READY" != "true" ]; then
+                echo "ERROR: VM not running after 10 minutes"
+                exit 1
+              fi
+
               # Wait a bit more for SSH to be available
               echo "Waiting for SSH connectivity..."
+              SSH_READY=false
               for i in $(seq 1 30); do
                 if /tmp/virtctl ssh "${VM_USER}@${VM_NAME}" -n "${VM_NS}" -t 5 \
                   --local-ssh-opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
                   -c "echo ok" 2>/dev/null | grep -q ok; then
                   echo "SSH is ready"
+                  SSH_READY=true
                   break
                 fi
                 echo "  SSH not ready, retrying in 10s... ($i/30)"
                 sleep 10
               done
+
+              if [ "$SSH_READY" != "true" ]; then
+                echo "ERROR: SSH not available after 5 minutes"
+                exit 1
+              fi
 
               # ── Step 3: Download roxagent binary onto the VM ──
               echo "Installing roxagent ${ROXAGENT_VERSION} on VM..."
