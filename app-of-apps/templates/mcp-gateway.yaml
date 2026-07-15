@@ -15,5 +15,7 @@ spec:
       valuesObject:
         subscription:
           source: {{ include "app-of-apps.operatorSource" . }}
+        gateway:
+          clusterSubdomain: {{ .Values.cluster.subdomain }}
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}

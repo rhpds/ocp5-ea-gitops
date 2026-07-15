@@ -4,4 +4,7 @@ subscription:
   name: mcp-gateway
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  namespace: openshift-operators
+
+gateway:
+  name: mcp-gateway
+  gatewayClassName: openshift-default

@@ -40,7 +40,7 @@ clusterObservability:
 mcpGateway:
   enabled: true
   name: mcp-gateway
-  namespace: openshift-operators
+  namespace: mcp-gateway
 
 openshiftMcpServer:
   enabled: true
