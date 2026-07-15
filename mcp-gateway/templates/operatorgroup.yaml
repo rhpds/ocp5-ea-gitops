@@ -4,6 +4,4 @@ kind: OperatorGroup
 metadata:
   name: mcp-gateway
   namespace: {{ .Release.Namespace }}
-spec:
-  targetNamespaces:
-    - {{ .Release.Namespace }}
+spec: {}
