@@ -47,6 +47,11 @@ openshiftMcpServer:
   name: openshift-mcp-server
   namespace: openshift-mcp
 
+webTerminal:
+  enabled: true
+  name: web-terminal
+  namespace: openshift-operators
+
 openshiftLightspeed:
   enabled: true
   name: openshift-lightspeed
