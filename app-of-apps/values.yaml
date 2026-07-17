@@ -26,7 +26,6 @@ acs:
   namespace: acs
   clusterName: local-cluster
   adminPassword: ""
-  pullSecret: ""
 
 acsVirt:
   enabled: true

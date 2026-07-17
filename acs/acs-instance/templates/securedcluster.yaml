@@ -7,8 +7,6 @@ metadata:
     argocd.argoproj.io/sync-wave: "4"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  imagePullSecrets:
-    - name: acs-nightly-pull-secret
   clusterName: {{ .Values.clusterName }}
   admissionControl:
     listenOnCreates: true

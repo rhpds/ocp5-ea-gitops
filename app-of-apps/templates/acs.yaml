@@ -13,16 +13,9 @@ spec:
     targetRevision: {{ .Values.gitops.targetRevision }}
     helm:
       valuesObject:
-        acs-operator:
-{{- if .Values.acs.pullSecret }}
-          catalogSource:
-            pullSecret: {{ .Values.acs.pullSecret }}
-{{- end }}
+        acs-operator: {}
         acs-instance:
           clusterName: {{ .Values.acs.clusterName }}
           adminPassword: {{ .Values.acs.adminPassword }}
-{{- if .Values.acs.pullSecret }}
-          pullSecret: {{ .Values.acs.pullSecret }}
-{{- end }}
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}

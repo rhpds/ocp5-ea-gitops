@@ -15,7 +15,6 @@ catalogSource:
   name: acs-nightly-catalog
   image: quay.io/rhacs-eng/stackrox-operator-index:v4.12.0-nightly-20260714-fast
   displayName: ACS Nightly Catalog
-  pullSecret: ""
 
 imageDigestMirrorSet:
   enabled: true

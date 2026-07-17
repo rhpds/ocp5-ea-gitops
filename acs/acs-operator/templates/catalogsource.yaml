@@ -1,16 +1,5 @@
 {{- if .Values.catalogSource.enabled }}
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: acs-nightly-pull-secret
-  namespace: {{ .Values.namespace }}
-  annotations:
-    {{- include "acs-operator.argocd-syncwave" . | nindent 4 }}
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ .Values.catalogSource.pullSecret }}
----
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
@@ -22,8 +11,6 @@ spec:
   sourceType: grpc
   image: {{ .Values.catalogSource.image }}
   displayName: {{ .Values.catalogSource.displayName }}
-  secrets:
-    - acs-nightly-pull-secret
   grpcPodConfig:
     securityContextConfig: restricted
 {{- end }}

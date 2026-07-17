@@ -7,8 +7,6 @@ adminPassword: ""
 vmScanning:
   enabled: true
 
-pullSecret: ""
-
 argocd:
   enabled: true
   syncwave: "2"
