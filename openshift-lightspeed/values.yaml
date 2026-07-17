@@ -9,8 +9,8 @@ subscription:
 llm:
   apiUrl: ""
   apiKey: ""
-  provider: openai
-  model: qwen3-235b
+  provider: ""
+  model: ""
 
 featureGates:
   - MCPServer

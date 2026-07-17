@@ -26,6 +26,7 @@ acs:
   namespace: acs
   clusterName: local-cluster
   adminPassword: ""
+  pullSecret: ""
 
 acsVirt:
   enabled: true
@@ -59,5 +60,5 @@ openshiftLightspeed:
   llm:
     apiUrl: ""
     apiKey: ""
-    provider: openai
-    model: qwen3-235b
+    provider: ""
+    model: ""

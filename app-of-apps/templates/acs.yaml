@@ -19,5 +19,8 @@ spec:
         acs-instance:
           clusterName: {{ .Values.acs.clusterName }}
           adminPassword: {{ .Values.acs.adminPassword }}
+{{- if .Values.acs.pullSecret }}
+          pullSecret: {{ .Values.acs.pullSecret }}
+{{- end }}
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}
