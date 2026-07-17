@@ -16,6 +16,8 @@ spec:
     collector:
       collection: EBPF
       imageFlavor: Regular
+    fileActivityMonitoring:
+      mode: Enabled
     taintToleration: TolerateTaints
 {{- if .Values.vmScanning.enabled }}
   customize:
