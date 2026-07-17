@@ -4,7 +4,7 @@ name: rhacs-operator
 namespace: openshift-operators
 
 subscription:
-  channel: stable
+  channel: fast
   installPlanApproval: Automatic
   name: rhacs-operator
   source: acs-nightly-catalog
