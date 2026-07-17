@@ -13,7 +13,11 @@ spec:
     targetRevision: {{ .Values.gitops.targetRevision }}
     helm:
       valuesObject:
-        acs-operator: {}
+        acs-operator:
+{{- if .Values.acs.pullSecret }}
+          catalogSource:
+            pullSecret: {{ .Values.acs.pullSecret }}
+{{- end }}
         acs-instance:
           clusterName: {{ .Values.acs.clusterName }}
           adminPassword: {{ .Values.acs.adminPassword }}
