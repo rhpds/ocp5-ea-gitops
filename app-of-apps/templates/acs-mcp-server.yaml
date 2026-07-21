@@ -18,6 +18,8 @@ spec:
             url: "central.{{ .Values.acs.namespace }}:443"
         centralCACert:
           existingSecretName: central-ca-cert
+        image:
+          tag: "05222ea"
         tlsSecret:
           existingSecretName: acs-mcp-server-tls
         service:
