@@ -10,14 +10,15 @@ metadata:
 spec:
   gatewayClassName: {{ .Values.gateway.gatewayClassName }}
   listeners:
-    - name: http
-      port: 80
+    - name: mcp
+      hostname: mcp.{{ .Values.gateway.clusterSubdomain }}
+      port: 8080
       protocol: HTTP
       allowedRoutes:
         namespaces:
           from: All
     - name: mcps
-      hostname: mcp.{{ .Values.gateway.clusterSubdomain }}
+      hostname: "*.mcp.internal"
       port: 8080
       protocol: HTTP
       allowedRoutes:
