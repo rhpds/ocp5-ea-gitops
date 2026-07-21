@@ -4,6 +4,8 @@ clusterName: local-cluster
 
 adminPassword: ""
 
+clusterSubdomain: ""
+
 vmScanning:
   enabled: true
 
