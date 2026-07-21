@@ -16,5 +16,11 @@ spec:
         config:
           central:
             url: "central.{{ .Values.acs.namespace }}:443"
+        tlsSecret:
+          existingSecretName: acs-mcp-server-tls
+        service:
+          type: ClusterIP
+          annotations:
+            service.beta.openshift.io/serving-cert-secret-name: acs-mcp-server-tls
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}
