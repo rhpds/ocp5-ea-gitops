@@ -52,6 +52,11 @@ webTerminal:
   name: web-terminal
   namespace: openshift-operators
 
+openshiftLightspeedTroubleshooting:
+  enabled: true
+  name: openshift-lightspeed-troubleshooting
+  namespace: inventory
+
 openshiftLightspeed:
   enabled: true
   name: openshift-lightspeed
