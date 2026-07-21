@@ -36,7 +36,7 @@ spec:
 
               oc create secret generic "${TARGET_SECRET}" \
                 -n "${TARGET_NS}" \
-                --from-literal=ca.pem="$CA_CERT" \
+                --from-literal=ca.crt="$CA_CERT" \
                 --dry-run=client -o yaml | oc apply -f -
 
               echo "CA cert copied successfully"
