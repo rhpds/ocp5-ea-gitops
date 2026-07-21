@@ -16,8 +16,8 @@ spec:
         config:
           central:
             url: "central.{{ .Values.acs.namespace }}:443"
-            # TODO: Replace with proper CA trust (centralCACert) instead of skipping TLS verification
-            insecureSkipTLSVerify: true
+        centralCACert:
+          existingSecretName: central-ca-cert
         tlsSecret:
           existingSecretName: acs-mcp-server-tls
         service:
