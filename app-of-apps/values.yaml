@@ -42,6 +42,11 @@ mcpGateway:
   name: mcp-gateway
   namespace: mcp-gateway
 
+acsMcpServer:
+  enabled: true
+  name: acs-mcp-server
+  namespace: acs-mcp
+
 openshiftMcpServer:
   enabled: true
   name: openshift-mcp-server
