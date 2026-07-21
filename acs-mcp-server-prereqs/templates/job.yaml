@@ -26,7 +26,8 @@ spec:
 
               echo "Copying CA cert from ${SOURCE_NS}/${SOURCE_SECRET} to ${TARGET_NS}/${TARGET_SECRET}..."
 
-              CA_CERT=$(oc get secret "${SOURCE_SECRET}" -n "${SOURCE_NS}" -o jsonpath="{.data['${SOURCE_KEY}']}" | base64 -d)
+              oc extract secret/"${SOURCE_SECRET}" -n "${SOURCE_NS}" --keys="${SOURCE_KEY}" --to=/tmp --confirm
+              CA_CERT=$(cat /tmp/${SOURCE_KEY})
 
               if [ -z "$CA_CERT" ]; then
                 echo "ERROR: Could not read ${SOURCE_KEY} from ${SOURCE_SECRET} in ${SOURCE_NS}"
