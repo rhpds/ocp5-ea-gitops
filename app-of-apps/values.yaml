@@ -62,9 +62,9 @@ webTerminal:
   name: web-terminal
   namespace: openshift-operators
 
-openshiftLightspeed:
+openshiftAgenticLightspeed:
   enabled: true
-  name: openshift-lightspeed
+  name: openshift-agentic-lightspeed
   namespace: openshift-lightspeed
   llm:
     apiUrl: ""
