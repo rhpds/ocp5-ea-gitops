@@ -1,0 +1,23 @@
+namespace: openshift-lightspeed
+
+llm:
+  apiUrl: ""
+  apiKey: ""
+  provider: ""
+  model: ""
+
+featureGates:
+  - MCPServer
+
+mcpServer:
+  name: openshift-mcp
+  url: http://openshift-mcp-server.openshift-mcp.svc.cluster.local:8080/mcp
+  timeout: 120
+
+agentic:
+  enabled: true
+  operatorImage: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-operator:main
+  sandboxImage: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-sandbox@sha256:00602f8e2a999db26707265e4d5fa3c36602e7823b4253444f319c22375ac960
+  consoleImage: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-console:main
+  sandboxMode: bare-pod
+  githubRaw: https://raw.githubusercontent.com/openshift/lightspeed-agentic-operator/main
