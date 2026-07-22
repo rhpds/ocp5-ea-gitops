@@ -4,10 +4,11 @@ kind: Application
 {{ include "app-of-apps.metadata" (dict "name" "openshift-lightspeed" "namespace" .Values.argocd.namespace "syncWave" "1") }}
 spec:
   ignoreDifferences:
-    - group: ols.openshift.io
-      kind: OLSConfig
+    - group: ""
+      kind: ConfigMap
+      name: alerts-adapter-config
       jsonPointers:
-        - /spec/ols/deployment/alertsAdapter/configMapRef/name
+        - /data
   destination:
     namespace: {{ .Values.openshiftAgenticLightspeed.namespace }}
     server: https://kubernetes.default.svc
