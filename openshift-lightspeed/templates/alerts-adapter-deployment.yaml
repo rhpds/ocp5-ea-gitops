@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lightspeed-agentic-alerts-adapter
-  namespace: {{ .Values.subscription.namespace }}
+  namespace: {{ .Values.namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "5"
 spec:
