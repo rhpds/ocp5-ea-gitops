@@ -12,11 +12,11 @@ webhooks:
   - name: agenticrunapproval-mutator.agentic.openshift.io
     namespaceSelector:
       matchLabels:
-        kubernetes.io/metadata.name: {{ .Values.subscription.namespace }}
+        kubernetes.io/metadata.name: {{ .Values.namespace }}
     clientConfig:
       service:
         name: agentic-operator-webhook-service
-        namespace: {{ .Values.subscription.namespace }}
+        namespace: {{ .Values.namespace }}
         path: /mutate-agenticrunapproval
     rules:
       - apiGroups:

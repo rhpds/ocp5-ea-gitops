@@ -4,7 +4,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: agentic-install-crds
-  namespace: {{ .Values.subscription.namespace }}
+  namespace: {{ .Values.namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "4"
     argocd.argoproj.io/hook: Sync

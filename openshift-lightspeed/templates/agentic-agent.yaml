@@ -5,7 +5,7 @@ apiVersion: agentic.openshift.io/v1alpha1
 kind: Agent
 metadata:
   name: default
-  namespace: {{ .Values.subscription.namespace }}
+  namespace: {{ .Values.namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "7"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true

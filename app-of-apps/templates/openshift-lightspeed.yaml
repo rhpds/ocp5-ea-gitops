@@ -13,8 +13,6 @@ spec:
     targetRevision: {{ .Values.gitops.targetRevision }}
     helm:
       valuesObject:
-        subscription:
-          source: {{ include "app-of-apps.operatorSource" . }}
         llm:
           apiUrl: {{ .Values.openshiftLightspeed.llm.apiUrl }}
           apiKey: {{ .Values.openshiftLightspeed.llm.apiKey }}

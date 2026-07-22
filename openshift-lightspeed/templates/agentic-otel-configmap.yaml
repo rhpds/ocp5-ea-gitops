@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: lightspeed-otel-collector-client
-  namespace: {{ .Values.subscription.namespace }}
+  namespace: {{ .Values.namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "4"
 data: {}

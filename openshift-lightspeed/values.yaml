@@ -1,10 +1,4 @@
-subscription:
-  channel: stable
-  installPlanApproval: Automatic
-  name: lightspeed-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-  namespace: openshift-lightspeed
+namespace: openshift-lightspeed
 
 llm:
   apiUrl: ""
@@ -27,8 +21,3 @@ agentic:
   consoleImage: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-console:main
   sandboxMode: bare-pod
   githubRaw: https://raw.githubusercontent.com/openshift/lightspeed-agentic-operator/main
-
-# TEMPORARY: Custom MCP server image for Perses integration
-mcpImagePatch:
-  csvName: lightspeed-operator.v1.1.1
-  image: quay.io/tremes/ocp-mcp

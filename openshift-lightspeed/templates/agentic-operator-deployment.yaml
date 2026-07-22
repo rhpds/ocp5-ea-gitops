@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lightspeed-agentic-operator
-  namespace: {{ .Values.subscription.namespace }}
+  namespace: {{ .Values.namespace }}
   labels:
     app: lightspeed-agentic-operator
   annotations:
@@ -28,7 +28,7 @@ spec:
         - name: manager
           image: {{ .Values.agentic.operatorImage }}
           args:
-            - --namespace={{ .Values.subscription.namespace }}
+            - --namespace={{ .Values.namespace }}
             - --sandbox-mode={{ .Values.agentic.sandboxMode }}
             - --agentic-sandbox-image={{ .Values.agentic.sandboxImage }}
           ports:
