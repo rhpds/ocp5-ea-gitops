@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   name: user-imports
   labels:
-    openshift.io/cluster-monitoring: "true"
+    openshift.io/user-monitoring: "true"

@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   name: catalog-service
   labels:
-    openshift.io/cluster-monitoring: "true"
+    openshift.io/user-monitoring: "true"
