@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: inventory-app
   namespace: inventory
+  annotations:
+    argocd.argoproj.io/ignore-healthcheck: "true"
   labels:
     app: inventory-app
     app.kubernetes.io/part-of: inventory-system

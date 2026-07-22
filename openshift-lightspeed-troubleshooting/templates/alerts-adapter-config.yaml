@@ -6,8 +6,7 @@ metadata:
 data:
   config.yaml: |
     pollInterval: 30s
-    initialDelay: 5m
-    cooldownWindow: 1h
+    postRunDelay: 1h
     filtering:
       allowedReceivers:
-        - default
+        - critical
