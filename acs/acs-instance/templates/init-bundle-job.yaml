@@ -15,10 +15,11 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: crs-generator
-          image: registry.redhat.io/openshift4/ose-cli:latest
+          image: registry.redhat.io/openshift4/ose-cli-rhel9:latest
           command: ["/bin/bash", "-c"]
           args:
             - |
+              set -eo pipefail
               NAMESPACE="{{ .Release.Namespace }}"
               # Wait for Central to be ready
               echo "Waiting for Central..."
