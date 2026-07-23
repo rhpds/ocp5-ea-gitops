@@ -1,4 +1,4 @@
-{{- if .Values.auth.keycloakUrl }}
+{{- if .Values.auth.clusterSubdomain }}
 ---
 apiVersion: kuadrant.io/v1
 kind: AuthPolicy
@@ -17,7 +17,7 @@ spec:
     authentication:
       keycloak-jwt:
         jwt:
-          issuerUrl: {{ .Values.auth.keycloakUrl }}/realms/{{ .Values.auth.realm }}
+          issuerUrl: https://sso.{{ .Values.auth.clusterSubdomain }}/realms/{{ .Values.auth.realm }}
         credentials:
           authorizationHeader:
             prefix: Bearer

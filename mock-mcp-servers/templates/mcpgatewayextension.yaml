@@ -9,10 +9,10 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   privateHost: "http://mcp-gateway-openshift-default.openshift-ingress.svc.cluster.local:80"
-{{- if .Values.auth.keycloakUrl }}
+{{- if .Values.auth.clusterSubdomain }}
   oauthProtectedResource:
     authorizationServers:
-      - {{ .Values.auth.keycloakUrl }}/realms/{{ .Values.auth.realm }}
+      - https://sso.{{ .Values.auth.clusterSubdomain }}/realms/{{ .Values.auth.realm }}
     resourceName: "MCP Gateway"
     bearerMethodsSupported:
       - header
