@@ -12,19 +12,19 @@ spec:
   listeners:
     - name: mcp
       hostname: mcp.{{ .Values.gateway.clusterSubdomain }}
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: mcp-https
-      hostname: mcp.{{ .Values.gateway.clusterSubdomain }}
       port: 443
       protocol: HTTPS
       tls:
         mode: Terminate
         certificateRefs:
           - name: mcp-gateway-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: mcp-http
+      hostname: mcp.{{ .Values.gateway.clusterSubdomain }}
+      port: 80
+      protocol: HTTP
       allowedRoutes:
         namespaces:
           from: All
