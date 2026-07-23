@@ -5,7 +5,8 @@ gateway:
   namespace: openshift-ingress
 
 auth:
-  issuerUrl: ""
+  keycloakUrl: ""
+  realm: keycloak
 
 servers:
   - name: inventory

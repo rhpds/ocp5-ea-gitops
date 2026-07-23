@@ -67,7 +67,7 @@ mockMcpServers:
   name: mock-mcp-servers
   namespace: mock-mcp-servers
   auth:
-    issuerUrl: ""
+    keycloakUrl: ""
 
 teamAMcp:
   enabled: true

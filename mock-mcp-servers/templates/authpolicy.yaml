@@ -1,4 +1,4 @@
-{{- if .Values.auth.issuerUrl }}
+{{- if .Values.auth.keycloakUrl }}
 ---
 apiVersion: kuadrant.io/v1
 kind: AuthPolicy
@@ -17,7 +17,7 @@ spec:
     authentication:
       keycloak-jwt:
         jwt:
-          issuerUrl: {{ .Values.auth.issuerUrl }}
+          issuerUrl: {{ .Values.auth.keycloakUrl }}/realms/{{ .Values.auth.realm }}
         credentials:
           authorizationHeader:
             prefix: Bearer
