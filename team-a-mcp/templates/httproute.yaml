@@ -13,7 +13,6 @@ metadata:
 spec:
   parentRefs:
     - name: team-a-gateway
-      namespace: {{ $.Values.gateway.namespace }}
   hostnames:
     - '{{ .name }}.mcp.internal'
   rules:

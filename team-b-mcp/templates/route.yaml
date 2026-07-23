@@ -1,0 +1,19 @@
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: team-b-gateway
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  host: team-b-mcp.{{ .Values.clusterSubdomain }}
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: team-b-gateway-openshift-default
+    weight: 100

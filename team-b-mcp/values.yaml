@@ -1,8 +1,6 @@
 image: quay.io/jfalkner1/mock-mcp-server:latest
 
-gateway:
-  name: mcp-gateway
-  namespace: openshift-ingress
+clusterSubdomain: ""
 
 servers:
   - name: payments

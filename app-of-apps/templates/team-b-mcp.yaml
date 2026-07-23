@@ -11,5 +11,8 @@ spec:
     path: team-b-mcp
     repoURL: {{ .Values.gitops.repoURL }}
     targetRevision: {{ .Values.gitops.targetRevision }}
+    helm:
+      valuesObject:
+        clusterSubdomain: {{ .Values.cluster.subdomain }}
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}
