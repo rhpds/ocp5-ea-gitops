@@ -9,3 +9,8 @@ gateway:
   name: mcp-gateway
   namespace: openshift-ingress
   gatewayClassName: openshift-default
+  tls:
+    clusterIssuer: zerossl-production-aws
+  tls:
+    clusterIssuer: zerossl-production-aws
+    secretName: mcp-gateway-tls-cert

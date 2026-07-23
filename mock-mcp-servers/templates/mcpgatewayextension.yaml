@@ -13,4 +13,4 @@ spec:
     kind: Gateway
     name: {{ .Values.gateway.name }}
     namespace: {{ .Values.gateway.namespace }}
-    sectionName: mcp
+    sectionName: mcp-https
