@@ -5,7 +5,7 @@ kind: ClusterRoleBinding
 metadata:
   name: lightspeed-agent-cluster-reader
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: "1"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -20,7 +20,7 @@ kind: ClusterRoleBinding
 metadata:
   name: lightspeed-agent-monitoring-view
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: "1"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
