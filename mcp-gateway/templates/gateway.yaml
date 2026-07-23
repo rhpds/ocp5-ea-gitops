@@ -13,7 +13,7 @@ spec:
   listeners:
     - name: mcp
       hostname: mcp.{{ .Values.gateway.clusterSubdomain }}
-      port: 8080
+      port: 80
       protocol: HTTP
       allowedRoutes:
         namespaces:
