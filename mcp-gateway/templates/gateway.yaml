@@ -30,7 +30,7 @@ spec:
           from: All
     - name: mcps
       hostname: "*.mcp.internal"
-      port: 8080
+      port: 80
       protocol: HTTP
       allowedRoutes:
         namespaces:
