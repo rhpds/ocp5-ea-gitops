@@ -8,6 +8,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
+  privateHost: "http://team-a-gateway-openshift-default.{{ .Release.Namespace }}.svc.cluster.local:80"
   targetRef:
     group: gateway.networking.k8s.io
     kind: Gateway
