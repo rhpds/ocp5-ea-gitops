@@ -62,6 +62,11 @@ webTerminal:
   name: web-terminal
   namespace: openshift-operators
 
+mockMcpServers:
+  enabled: true
+  name: mock-mcp-servers
+  namespace: mock-mcp-servers
+
 openshiftLightspeedTroubleshooting:
   enabled: true
   name: openshift-lightspeed-troubleshooting
