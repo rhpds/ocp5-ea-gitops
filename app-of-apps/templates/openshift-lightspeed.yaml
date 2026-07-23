@@ -17,5 +17,12 @@ spec:
     path: openshift-lightspeed
     repoURL: {{ .Values.gitops.repoURL }}
     targetRevision: {{ .Values.gitops.targetRevision }}
+    helm:
+      valuesObject:
+        llm:
+          apiUrl: {{ .Values.openshiftAgenticLightspeed.llm.apiUrl }}
+          apiKey: {{ .Values.openshiftAgenticLightspeed.llm.apiKey }}
+          provider: {{ .Values.openshiftAgenticLightspeed.llm.provider }}
+          model: {{ .Values.openshiftAgenticLightspeed.llm.model }}
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}
