@@ -1,7 +1,14 @@
 image: quay.io/jfalkner1/mock-mcp-server:latest
 
+gateway:
+  name: mcp-gateway
+  namespace: openshift-ingress
+
 servers:
   - name: inventory
+    hint: "Warehouse inventory management - products, stock levels, alerts"
+    categories:
+      - operations
     config: |
       name: inventory
       description: Warehouse inventory management system
@@ -139,6 +146,9 @@ servers:
             total: 2
 
   - name: payments
+    hint: "Payment processing - transactions, refunds, daily summaries"
+    categories:
+      - finance
     config: |
       name: payments
       description: Payment processing and transaction management system
@@ -305,6 +315,9 @@ servers:
             estimated_completion: "2026-07-23T14:00:00Z"
 
   - name: accounts
+    hint: "Customer account management - profiles, credit, order history"
+    categories:
+      - finance
     config: |
       name: accounts
       description: Customer account management system
