@@ -3,13 +3,13 @@
 apiVersion: mcp.kuadrant.io/v1alpha1
 kind: MCPServerRegistration
 metadata:
-  name: teamb-{{ .name }}
+  name: {{ .name }}
   namespace: {{ $.Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "3"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  prefix: "teamb_{{ .name }}_"
+  prefix: "{{ .name }}_"
   hint: {{ .hint | quote }}
   category:
     {{- range .categories }}
