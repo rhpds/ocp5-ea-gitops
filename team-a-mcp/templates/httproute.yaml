@@ -14,7 +14,7 @@ spec:
   parentRefs:
     - name: team-a-gateway
   hostnames:
-    - '{{ .name }}.mcp.internal'
+    - 'team-a-mcp.{{ $.Values.clusterSubdomain }}'
   rules:
     - matches:
         - path:
