@@ -35,16 +35,40 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: team-a
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: team-a-gateway
+  namespace: {{ .Values.gateway.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  gatewayClassName: {{ .Values.gateway.gatewayClassName }}
+  listeners:
+    - name: mcp
       hostname: team-a-mcp.{{ .Values.gateway.clusterSubdomain }}
-      port: 8081
+      port: 80
       protocol: HTTP
       allowedRoutes:
         namespaces:
           from: All
-    - name: team-b
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: team-b-gateway
+  namespace: {{ .Values.gateway.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  gatewayClassName: {{ .Values.gateway.gatewayClassName }}
+  listeners:
+    - name: mcp
       hostname: team-b-mcp.{{ .Values.gateway.clusterSubdomain }}
-      port: 8082
+      port: 80
       protocol: HTTP
       allowedRoutes:
         namespaces:

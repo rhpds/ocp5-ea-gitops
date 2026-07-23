@@ -12,7 +12,7 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   parentRefs:
-    - name: {{ $.Values.gateway.name }}
+    - name: team-a-gateway
       namespace: {{ $.Values.gateway.namespace }}
   hostnames:
     - '{{ .name }}.mcp.internal'
