@@ -11,5 +11,9 @@ spec:
     path: mock-mcp-servers
     repoURL: {{ .Values.gitops.repoURL }}
     targetRevision: {{ .Values.gitops.targetRevision }}
+    helm:
+      valuesObject:
+        auth:
+          issuerUrl: {{ .Values.mockMcpServers.auth.issuerUrl }}
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}

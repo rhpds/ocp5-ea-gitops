@@ -4,6 +4,9 @@ gateway:
   name: mcp-gateway
   namespace: openshift-ingress
 
+auth:
+  issuerUrl: ""
+
 servers:
   - name: inventory
     hint: "Warehouse inventory management - products, stock levels, alerts"

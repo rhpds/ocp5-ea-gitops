@@ -9,6 +9,16 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   privateHost: "http://mcp-gateway-openshift-default.openshift-ingress.svc.cluster.local:80"
+{{- if .Values.auth.issuerUrl }}
+  oauthProtectedResource:
+    authorizationServers:
+      - {{ .Values.auth.issuerUrl }}
+    resourceName: "MCP Gateway"
+    bearerMethodsSupported:
+      - header
+    scopesSupported:
+      - openid
+{{- end }}
   targetRef:
     group: gateway.networking.k8s.io
     kind: Gateway

@@ -66,6 +66,8 @@ mockMcpServers:
   enabled: true
   name: mock-mcp-servers
   namespace: mock-mcp-servers
+  auth:
+    issuerUrl: ""
 
 teamAMcp:
   enabled: true

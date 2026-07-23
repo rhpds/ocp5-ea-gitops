@@ -11,6 +11,19 @@ gateway:
   gatewayClassName: openshift-default
   tls:
     clusterIssuer: zerossl-production-aws
-  tls:
-    clusterIssuer: zerossl-production-aws
-    secretName: mcp-gateway-tls-cert
+
+keycloak:
+  realm: keycloak
+  clientId: mcp-gateway
+  clientSecret: mcp-gateway-secret
+  users:
+    - username: user1
+      password: user1pass
+      email: user1@example.com
+      firstName: MCP
+      lastName: User1
+    - username: user2
+      password: user2pass
+      email: user2@example.com
+      firstName: MCP
+      lastName: User2

@@ -1,0 +1,82 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycloak-mcp-setup
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    metadata:
+      labels:
+        app: keycloak-mcp-setup
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: setup
+          image: registry.redhat.io/openshift4/ose-cli-rhel9:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -eo pipefail
+
+              REALM="{{ .Values.keycloak.realm }}"
+              CLIENT_ID="{{ .Values.keycloak.clientId }}"
+              CLIENT_SECRET="{{ .Values.keycloak.clientSecret }}"
+
+              # Get Keycloak URL from OAuth config
+              SSO_URL=$(oc get oauth cluster -o jsonpath='{.spec.identityProviders[0].openID.issuer}' | sed 's|/realms/.*||')
+              echo "Keycloak URL: ${SSO_URL}"
+
+              # Get admin credentials from secret
+              ADMIN_USER=$(oc get secret keycloak-initial-admin -n keycloak -o jsonpath='{.data.username}' | base64 -d)
+              ADMIN_PASS=$(oc get secret keycloak-initial-admin -n keycloak -o jsonpath='{.data.password}' | base64 -d)
+
+              # Get admin token
+              ADMIN_TOKEN=$(curl -sk -X POST "${SSO_URL}/realms/master/protocol/openid-connect/token" \
+                -d "grant_type=password&client_id=admin-cli&username=${ADMIN_USER}&password=${ADMIN_PASS}" | \
+                python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+              # Create MCP client if it doesn't exist
+              EXISTING=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/clients?clientId=${CLIENT_ID}" \
+                -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+              if [ "$EXISTING" = "0" ]; then
+                echo "Creating client ${CLIENT_ID}..."
+                curl -sk -X POST "${SSO_URL}/admin/realms/${REALM}/clients" \
+                  -H "Authorization: Bearer ${ADMIN_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"clientId\":\"${CLIENT_ID}\",\"enabled\":true,\"publicClient\":false,\"secret\":\"${CLIENT_SECRET}\",\"directAccessGrantsEnabled\":true,\"standardFlowEnabled\":true,\"protocol\":\"openid-connect\"}"
+                echo "Client created"
+              else
+                echo "Client ${CLIENT_ID} already exists"
+              fi
+
+              # Create users
+              {{- range .Values.keycloak.users }}
+              EXISTING=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/users?username={{ .username }}&exact=true" \
+                -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+              if [ "$EXISTING" = "0" ]; then
+                echo "Creating user {{ .username }}..."
+                curl -sk -X POST "${SSO_URL}/admin/realms/${REALM}/users" \
+                  -H "Authorization: Bearer ${ADMIN_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d '{"username":"{{ .username }}","enabled":true,"emailVerified":true,"email":"{{ .email }}","firstName":"{{ .firstName }}","lastName":"{{ .lastName }}","credentials":[{"type":"password","value":"{{ .password }}","temporary":false}]}'
+                echo "User {{ .username }} created"
+              else
+                echo "User {{ .username }} already exists"
+              fi
+              {{- end }}
+
+              echo "Keycloak MCP setup complete"
