@@ -7,4 +7,5 @@ subscription:
 
 gateway:
   name: mcp-gateway
+  namespace: openshift-ingress
   gatewayClassName: openshift-default
