@@ -50,14 +50,18 @@ spec:
                 -d '{"name":"{{ .Values.clusterName }}"}')
 
               # Decode the CRS YAML and apply it
-              echo "$CRS_RESPONSE" | python3 -c "
+              echo "DEBUG: CRS response keys: $(echo "$CRS_RESPONSE" | python3 -c "import sys,json; print(list(json.load(sys.stdin).keys()))" 2>&1)"
+              CRS_YAML=$(echo "$CRS_RESPONSE" | python3 -c "
               import sys, json, base64
               d = json.load(sys.stdin)
               if 'crs' not in d:
-                  print('ERROR: Failed to generate CRS')
-                  print(json.dumps(d, indent=2))
+                  print('ERROR: Failed to generate CRS', file=sys.stderr)
+                  print(json.dumps(d, indent=2), file=sys.stderr)
                   sys.exit(1)
               print(base64.b64decode(d['crs']).decode())
-              " | oc apply -n "${NAMESPACE}" -f -
+              ")
+              echo "DEBUG: CRS YAML first 5 lines:"
+              echo "$CRS_YAML" | head -5
+              echo "$CRS_YAML" | oc apply -n "${NAMESPACE}" -f -
 
               echo "Cluster registration secret created successfully"
