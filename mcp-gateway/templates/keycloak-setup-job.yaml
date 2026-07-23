@@ -36,9 +36,7 @@ spec:
               CLIENT_ID="{{ .Values.keycloak.clientId }}"
               CLIENT_SECRET="{{ .Values.keycloak.clientSecret }}"
 
-              # Get Keycloak URL from route in keycloak namespace
-              SSO_HOST=$(oc get route keycloak -n keycloak -o jsonpath='{.spec.host}')
-              SSO_URL="https://${SSO_HOST}"
+              SSO_URL="https://sso.{{ .Values.gateway.clusterSubdomain }}"
               echo "Keycloak URL: ${SSO_URL}"
 
               # Get admin credentials from secret
