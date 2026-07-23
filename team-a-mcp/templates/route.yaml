@@ -12,7 +12,7 @@ spec:
     insecureEdgeTerminationPolicy: Redirect
     termination: edge
   port:
-    targetPort: 8080
+    targetPort: mcp
   to:
     kind: Service
     name: team-a-gateway-openshift-default
