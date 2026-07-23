@@ -67,6 +67,16 @@ mockMcpServers:
   name: mock-mcp-servers
   namespace: mock-mcp-servers
 
+teamAMcp:
+  enabled: true
+  name: team-a-mcp
+  namespace: team-a-mcp
+
+teamBMcp:
+  enabled: true
+  name: team-b-mcp
+  namespace: team-b-mcp
+
 openshiftLightspeedTroubleshooting:
   enabled: true
   name: openshift-lightspeed-troubleshooting

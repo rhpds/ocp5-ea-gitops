@@ -1,0 +1,5 @@
+apiVersion: v2
+name: team-a-mcp
+description: Team A isolated MCP servers (inventory, accounts)
+type: application
+version: 0.1.0

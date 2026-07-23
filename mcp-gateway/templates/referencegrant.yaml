@@ -14,6 +14,18 @@ spec:
     - group: mcp.kuadrant.io
       kind: MCPGatewayExtension
       namespace: mock-mcp-servers
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: team-a-mcp
+    - group: mcp.kuadrant.io
+      kind: MCPGatewayExtension
+      namespace: team-a-mcp
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: team-b-mcp
+    - group: mcp.kuadrant.io
+      kind: MCPGatewayExtension
+      namespace: team-b-mcp
   to:
     - group: gateway.networking.k8s.io
       kind: Gateway
