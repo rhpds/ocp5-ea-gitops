@@ -1,0 +1,68 @@
+{{- if .Values.agentic.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: agentic-cvo-override
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    metadata:
+      labels:
+        app: agentic-cvo-override
+    spec:
+      serviceAccountName: lightspeed-agentic-operator
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: cvo-override
+          image: registry.redhat.io/openshift4/ose-cli-rhel9:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              CRDS=(
+                "agents.agentic.openshift.io"
+                "analysisresults.agentic.openshift.io"
+                "llmproviders.agentic.openshift.io"
+                "proposals.agentic.openshift.io"
+              )
+
+              NEEDS_OVERRIDE=false
+              for crd in "${CRDS[@]}"; do
+                ANNOTATION=$(oc get crd "$crd" -o jsonpath='{.metadata.annotations.include\.release\.openshift\.io/self-managed-high-availability}' 2>/dev/null)
+                if [ "$ANNOTATION" = "true" ]; then
+                  echo "CRD $crd is CVO-managed"
+                  NEEDS_OVERRIDE=true
+                fi
+              done
+
+              if [ "$NEEDS_OVERRIDE" = "false" ]; then
+                echo "No agentic CRDs are CVO-managed, skipping override"
+                exit 0
+              fi
+
+              echo "Patching clusterversion to set agentic CRDs as unmanaged..."
+              oc patch clusterversion version --type merge -p '{
+                "spec": {
+                  "overrides": [
+                    {"kind": "CustomResourceDefinition", "name": "agents.agentic.openshift.io", "namespace": "", "group": "apiextensions.k8s.io", "unmanaged": true},
+                    {"kind": "CustomResourceDefinition", "name": "analysisresults.agentic.openshift.io", "namespace": "", "group": "apiextensions.k8s.io", "unmanaged": true},
+                    {"kind": "CustomResourceDefinition", "name": "llmproviders.agentic.openshift.io", "namespace": "", "group": "apiextensions.k8s.io", "unmanaged": true},
+                    {"kind": "CustomResourceDefinition", "name": "proposals.agentic.openshift.io", "namespace": "", "group": "apiextensions.k8s.io", "unmanaged": true}
+                  ]
+                }
+              }'
+              echo "CVO overrides applied successfully"
+{{- end }}
