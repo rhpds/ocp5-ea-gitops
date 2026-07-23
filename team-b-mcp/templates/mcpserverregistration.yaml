@@ -19,5 +19,4 @@ spec:
     group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: {{ .name }}-mcp-route
-    namespace: {{ $.Values.serversNamespace }}
 {{- end }}
