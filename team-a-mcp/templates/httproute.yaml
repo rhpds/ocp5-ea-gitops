@@ -23,6 +23,5 @@ spec:
             value: /
       backendRefs:
         - name: {{ .name }}-mcp
-          namespace: {{ $.Values.serversNamespace }}
           port: 8080
 {{- end }}
