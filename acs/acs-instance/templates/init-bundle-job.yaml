@@ -42,15 +42,33 @@ spec:
               PASSWORD=$(oc get secret central-htpasswd -n "${NAMESPACE}" -o jsonpath='{.data.password}' | base64 -d)
 {{- end }}
 
+              # Revoke any existing CRS with the same name (from a previous failed run)
+              EXISTING_ID=$(curl -sk -u "admin:${PASSWORD}" \
+                https://central.${NAMESPACE}.svc:443/v1/cluster-init/crs 2>/dev/null \
+                | python3 -c "
+              import sys, json
+              d = json.load(sys.stdin)
+              for item in d.get('items', []):
+                  if item.get('name') == '{{ .Values.clusterName }}':
+                      print(item['id'])
+                      break
+              " 2>/dev/null)
+              if [ -n "$EXISTING_ID" ]; then
+                echo "Revoking existing CRS (id: ${EXISTING_ID})..."
+                curl -sk -u "admin:${PASSWORD}" \
+                  -X PATCH https://central.${NAMESPACE}.svc:443/v1/cluster-init/crs/revoke \
+                  -H "Content-Type: application/json" \
+                  -d "{\"ids\":[\"${EXISTING_ID}\"]}"
+                echo ""
+              fi
+
               # Generate a Cluster Registration Secret (CRS) via the Central API
-              # The API returns a base64-encoded YAML Secret document in the 'crs' field
               CRS_RESPONSE=$(curl -sk -u "admin:${PASSWORD}" \
                 -X POST https://central.${NAMESPACE}.svc:443/v1/cluster-init/crs \
                 -H "Content-Type: application/json" \
                 -d '{"name":"{{ .Values.clusterName }}"}')
 
               # Decode the CRS YAML and apply it
-              echo "DEBUG: CRS response keys: $(echo "$CRS_RESPONSE" | python3 -c "import sys,json; print(list(json.load(sys.stdin).keys()))" 2>&1)"
               CRS_YAML=$(echo "$CRS_RESPONSE" | python3 -c "
               import sys, json, base64
               d = json.load(sys.stdin)
@@ -60,8 +78,6 @@ spec:
                   sys.exit(1)
               print(base64.b64decode(d['crs']).decode())
               ")
-              echo "DEBUG: CRS YAML first 5 lines:"
-              echo "$CRS_YAML" | head -5
               echo "$CRS_YAML" | oc apply -n "${NAMESPACE}" -f -
 
               echo "Cluster registration secret created successfully"
