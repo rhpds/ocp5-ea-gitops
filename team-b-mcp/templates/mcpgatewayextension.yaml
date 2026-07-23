@@ -12,4 +12,5 @@ spec:
     group: gateway.networking.k8s.io
     kind: Gateway
     name: team-b-gateway
+    namespace: {{ .Release.Namespace }}
     sectionName: mcp
