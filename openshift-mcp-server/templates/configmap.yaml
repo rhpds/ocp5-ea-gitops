@@ -12,3 +12,4 @@ data:
     read_only = false
     cluster_auth_mode = "passthrough"
     skip_jwt_verification = true
+    prometheus_url = "https://thanos-querier.openshift-monitoring.svc:9091"
