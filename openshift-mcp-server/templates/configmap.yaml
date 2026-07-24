@@ -17,3 +17,7 @@ data:
     prometheus_url = "https://thanos-querier.openshift-monitoring.svc.cluster.local:9091"
     insecure = true
     auth_mode = "header"
+
+    [toolset_configs.netedge]
+    auth_mode = "header"
+    insecure = true
