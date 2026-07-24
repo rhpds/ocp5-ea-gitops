@@ -1,4 +1,5 @@
 namespace: openshift-mcp
+clusterSubdomain: ""
 name: openshift-mcp-server
 image: registry.redhat.io/openshift-mcp-tech-preview/openshift-mcp-server-rhel9:0.3
 
@@ -8,3 +9,21 @@ toolsets:
   - metrics
   - netedge
   - openshift
+
+keycloak:
+  realm: keycloak
+  clientId: mcp-server
+  clientSecret: mcp-server-secret
+  users:
+    - username: mcp-admin
+      password: mcpadminpass
+      email: mcp-admin@example.com
+      firstName: MCP
+      lastName: Admin
+      clusterRole: cluster-admin
+    - username: mcp-viewer
+      password: mcpviewerpass
+      email: mcp-viewer@example.com
+      firstName: MCP
+      lastName: Viewer
+      clusterRole: view

@@ -9,6 +9,8 @@ data:
     toolsets = [{{- range $i, $t := .Values.toolsets }}{{- if $i }},{{ end }}"{{ $t }}"{{- end }}]
     log_level = 0
     port = "8080"
-    read_only = true
+    read_only = false
     cluster_auth_mode = "passthrough"
-    skip_jwt_verification = true
+    require_oauth = true
+    authorization_url = "https://sso.{{ .Values.clusterSubdomain }}/realms/{{ .Values.keycloak.realm }}"
+    oauth_audience = "{{ .Values.keycloak.clientId }}"
