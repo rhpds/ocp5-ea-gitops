@@ -84,7 +84,7 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: keycloak-mcp-setup
+  name: keycloak-mcp-server-setup
   namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "0"
@@ -92,7 +92,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: keycloak-mcp-setup
+  name: keycloak-mcp-server-setup
   namespace: keycloak
   annotations:
     argocd.argoproj.io/sync-wave: "0"
@@ -105,15 +105,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: keycloak-mcp-setup
+  name: keycloak-mcp-server-setup
   namespace: keycloak
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 subjects:
   - kind: ServiceAccount
-    name: keycloak-mcp-setup
+    name: keycloak-mcp-server-setup
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
-  name: keycloak-mcp-setup
+  name: keycloak-mcp-server-setup
   apiGroup: rbac.authorization.k8s.io
