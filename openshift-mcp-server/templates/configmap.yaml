@@ -12,4 +12,3 @@ data:
     read_only = false
     cluster_auth_mode = "passthrough"
     skip_jwt_verification = true
-    server_url = "https://mcp-server.{{ .Values.clusterSubdomain }}"
