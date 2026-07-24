@@ -11,7 +11,5 @@ data:
     port = "8080"
     read_only = false
     cluster_auth_mode = "passthrough"
-    require_oauth = true
-    authorization_url = "https://sso.{{ .Values.clusterSubdomain }}/realms/{{ .Values.keycloak.realm }}"
-    oauth_audience = "{{ .Values.keycloak.clientId }}"
+    skip_jwt_verification = true
     server_url = "https://mcp-server.{{ .Values.clusterSubdomain }}"

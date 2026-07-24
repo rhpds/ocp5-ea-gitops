@@ -33,55 +33,18 @@ spec:
             - |
               set -eo pipefail
 
-              REALM="{{ .Values.keycloak.realm }}"
-              CLIENT_ID="{{ .Values.keycloak.clientId }}"
-              CLIENT_SECRET="{{ .Values.keycloak.clientSecret }}"
-
               SSO_URL="https://sso.{{ .Values.clusterSubdomain }}"
+              REALM="keycloak"
               echo "Keycloak URL: ${SSO_URL}"
 
-              # Get admin credentials from secret
               ADMIN_USER=$(oc get secret keycloak-initial-admin -n keycloak -o jsonpath='{.data.username}' | base64 -d)
               ADMIN_PASS=$(oc get secret keycloak-initial-admin -n keycloak -o jsonpath='{.data.password}' | base64 -d)
 
-              # Get admin token
               ADMIN_TOKEN=$(curl -sk -X POST "${SSO_URL}/realms/master/protocol/openid-connect/token" \
                 -d "grant_type=password&client_id=admin-cli&username=${ADMIN_USER}&password=${ADMIN_PASS}" | \
                 python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
 
-              # Create MCP server client if it doesn't exist
-              EXISTING=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/clients?clientId=${CLIENT_ID}" \
-                -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
-              if [ "$EXISTING" = "0" ]; then
-                echo "Creating client ${CLIENT_ID}..."
-                curl -sk -X POST "${SSO_URL}/admin/realms/${REALM}/clients" \
-                  -H "Authorization: Bearer ${ADMIN_TOKEN}" \
-                  -H "Content-Type: application/json" \
-                  -d "{\"clientId\":\"${CLIENT_ID}\",\"enabled\":true,\"publicClient\":true,\"directAccessGrantsEnabled\":true,\"standardFlowEnabled\":true,\"protocol\":\"openid-connect\",\"redirectUris\":[\"https://mcp-server.{{ .Values.clusterSubdomain }}/*\",\"http://localhost/*\",\"http://127.0.0.1/*\"],\"webOrigins\":[\"*\"],\"attributes\":{\"pkce.code.challenge.method\":\"S256\"}}"
-                echo "Client created"
-              else
-                echo "Client ${CLIENT_ID} already exists"
-              fi
-
-              # Update trusted hosts policy for dynamic client registration
-              COMP_ID=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/components?type=org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy" \
-                -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "
-              import sys, json
-              for c in json.load(sys.stdin):
-                  if c['providerId'] == 'trusted-hosts':
-                      print(c['id']); break
-              ")
-              if [ -n "$COMP_ID" ]; then
-                echo "Updating trusted hosts policy..."
-                curl -sk -X PUT "${SSO_URL}/admin/realms/${REALM}/components/${COMP_ID}" \
-                  -H "Authorization: Bearer ${ADMIN_TOKEN}" \
-                  -H "Content-Type: application/json" \
-                  -d "{\"id\":\"${COMP_ID}\",\"name\":\"Trusted Hosts\",\"providerId\":\"trusted-hosts\",\"providerType\":\"org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy\",\"parentId\":\"${REALM}\",\"config\":{\"host-sending-registration-request-must-match\":[\"true\"],\"trusted-hosts\":[\"mcp-server.{{ .Values.clusterSubdomain }}\",\"localhost\",\"127.0.0.1\"],\"client-uris-must-match\":[\"true\"]}}"
-                echo "Trusted hosts updated"
-              fi
-
-              # Create users
-              {{- range .Values.keycloak.users }}
+              {{- range .Values.users }}
               EXISTING=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/users?username={{ .username }}&exact=true" \
                 -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
               if [ "$EXISTING" = "0" ]; then
@@ -96,7 +59,7 @@ spec:
               fi
               {{- end }}
 
-              echo "MCP server Keycloak setup complete"
+              echo "MCP server user setup complete"
 ---
 apiVersion: v1
 kind: ServiceAccount

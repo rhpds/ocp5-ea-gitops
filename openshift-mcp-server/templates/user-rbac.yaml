@@ -1,4 +1,4 @@
-{{- range .Values.keycloak.users }}
+{{- range .Values.users }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
