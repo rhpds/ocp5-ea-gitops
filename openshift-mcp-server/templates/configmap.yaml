@@ -14,3 +14,5 @@ data:
     require_oauth = true
     authorization_url = "https://sso.{{ .Values.clusterSubdomain }}/realms/{{ .Values.keycloak.realm }}"
     oauth_audience = "{{ .Values.keycloak.clientId }}"
+    disable_dynamic_client_registration = true
+    server_url = "https://mcp-server.{{ .Values.clusterSubdomain }}"
