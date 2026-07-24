@@ -5,3 +5,6 @@ image: registry.redhat.io/openshift-lightspeed/openshift-mcp-server-rhel9@sha256
 toolsets:
   - core
   - config
+  - metrics
+  - netedge
+  - openshift
