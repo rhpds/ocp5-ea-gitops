@@ -57,10 +57,27 @@ spec:
                 curl -sk -X POST "${SSO_URL}/admin/realms/${REALM}/clients" \
                   -H "Authorization: Bearer ${ADMIN_TOKEN}" \
                   -H "Content-Type: application/json" \
-                  -d "{\"clientId\":\"${CLIENT_ID}\",\"enabled\":true,\"publicClient\":false,\"secret\":\"${CLIENT_SECRET}\",\"directAccessGrantsEnabled\":true,\"standardFlowEnabled\":true,\"protocol\":\"openid-connect\"}"
+                  -d "{\"clientId\":\"${CLIENT_ID}\",\"enabled\":true,\"publicClient\":true,\"directAccessGrantsEnabled\":true,\"standardFlowEnabled\":true,\"protocol\":\"openid-connect\",\"redirectUris\":[\"https://mcp-server.{{ .Values.clusterSubdomain }}/*\",\"http://localhost/*\",\"http://127.0.0.1/*\"],\"webOrigins\":[\"*\"],\"attributes\":{\"pkce.code.challenge.method\":\"S256\"}}"
                 echo "Client created"
               else
                 echo "Client ${CLIENT_ID} already exists"
+              fi
+
+              # Update trusted hosts policy for dynamic client registration
+              COMP_ID=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/components?type=org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy" \
+                -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "
+              import sys, json
+              for c in json.load(sys.stdin):
+                  if c['providerId'] == 'trusted-hosts':
+                      print(c['id']); break
+              ")
+              if [ -n "$COMP_ID" ]; then
+                echo "Updating trusted hosts policy..."
+                curl -sk -X PUT "${SSO_URL}/admin/realms/${REALM}/components/${COMP_ID}" \
+                  -H "Authorization: Bearer ${ADMIN_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"id\":\"${COMP_ID}\",\"name\":\"Trusted Hosts\",\"providerId\":\"trusted-hosts\",\"providerType\":\"org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy\",\"parentId\":\"${REALM}\",\"config\":{\"host-sending-registration-request-must-match\":[\"true\"],\"trusted-hosts\":[\"mcp-server.{{ .Values.clusterSubdomain }}\",\"localhost\",\"127.0.0.1\"],\"client-uris-must-match\":[\"true\"]}}"
+                echo "Trusted hosts updated"
               fi
 
               # Create users
