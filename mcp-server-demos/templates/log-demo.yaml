@@ -41,6 +41,8 @@ kind: Pod
 metadata:
   name: failing-pod
   namespace: {{ .Values.logDemo.namespace }}
+  annotations:
+    argocd.argoproj.io/ignore-healthcheck: "true"
   labels:
     app: mcp-demo
     scenario: log-retrieval
