@@ -22,6 +22,7 @@ spec:
           tag: "05222ea"
         tlsSecret:
           existingSecretName: acs-mcp-server-tls
+        replicaCount: 1
         service:
           type: ClusterIP
           annotations:
