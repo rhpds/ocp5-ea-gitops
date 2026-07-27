@@ -23,13 +23,15 @@ spec:
         type: {{ .Values.llm.provider }}
         url: {{ .Values.llm.apiUrl | quote }}
   mcpServers:
-    - name: {{ .Values.mcpServer.name }}
-      url: {{ .Values.mcpServer.url | quote }}
-      timeout: {{ .Values.mcpServer.timeout }}
+{{- range .Values.mcpServers }}
+    - name: {{ .name }}
+      url: {{ .url | quote }}
+      timeout: {{ .timeout }}
       headers:
         - name: kubernetes-authorization
           valueFrom:
             type: kubernetes
+{{- end }}
   ols:
     logLevel: DEBUG
     defaultModel: {{ .Values.llm.model }}

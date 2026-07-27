@@ -26,7 +26,7 @@ spec:
             name: alerts-adapter-config
       containers:
         - name: adapter
-          image: quay.io/openshiftanalytics/lightspeed-agentic-alerts-adapter:latest
+          image: {{ .Values.images.alertsAdapter }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

@@ -1,15 +1,15 @@
 namespace: openshift-lightspeed
 
 images:
-  operator: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-operator@sha256:0f4eac671fafd4f27d683e150b6d767c701484c129f983c0d68fd1fb5ce790b1
-  serviceApi: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-service@sha256:2cda2f011996b457462ac3da3b00b37d854bc8bd48c60a8879a386a3e54b9b79
-  consolePlugin: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-console@sha256:91b7c5316e44e414f0256c276cf975ce5525f0a1ca7c1683730c66f271632f5e
+  operator: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-operator@sha256:cf864a9f6cd3af1ac3f539b982239fff4aafe576c518e3e189cfd9bd6733c4f7
+  serviceApi: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-service@sha256:73fa6825f8f24c4b893fba177ac415ad4322de56af7940b4a4084a9bc72a7910
+  consolePlugin: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-console@sha256:f53e11c14e291fb19f87a24fb512bbf59ec350bcb3af7a114663febc77b4c1b9
   postgres: registry.redhat.io/rhel9/postgresql-16@sha256:42f385ac3c9b8913426da7c57e70bc6617cd237aaf697c667f6385a8c0b0118b
   mcpServer: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/openshift-mcp-server@sha256:5b8e3b6a9d46e4825f731819274efbc88dc63f1dc47e8eefe9339bf90da4c02d
   dataverseExporter: registry.redhat.io/lightspeed-core/dataverse-exporter-rhel9@sha256:1c7ffaead23adfb1dc6bd3adfe75c80f284d6d31f13ca427d754703c78514cb2
-  agenticConsole: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-console@sha256:a7900060ec7928f03559bd2300bc1642ae0a57b10e30ce9f9804e8102a84b7f7
-  alertsAdapter: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-alerts-adapter@sha256:9049b11048de0717523b27e0c23ae283245df34b5dfb2d24571148e730cca4e2
-  otelCollector: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-otel-collector@sha256:85e8f70fea5c9005088767f787e39c65ebabac2295f38b3cd846157ef9dcebea
+  agenticConsole: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-console@sha256:b08ceeb59e29b55ceab15e87700ac6173ccf59d146dd616a3e2e7ed5ddc8927e
+  alertsAdapter: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-alerts-adapter@sha256:10af58d31ab3add2e6ec1058ba5d10a87e2d5a4d77258b3f47a0ffc84eff3770
+  otelCollector: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-otel-collector@sha256:fb86a2c82c959e8ec72e707ce6cc0c4005f806da38ec50da5606557346549cd3
   rhokp: registry.redhat.io/offline-knowledge-portal/rhokp-rhel9:latest
 
 llm:
@@ -21,10 +21,13 @@ llm:
 featureGates:
   - MCPServer
 
-mcpServer:
-  name: openshift-mcp
-  url: http://openshift-mcp-server.openshift-mcp.svc.cluster.local:8080/mcp
-  timeout: 120
+mcpServers:
+  - name: openshift-mcp
+    url: http://openshift-mcp-server.openshift-mcp.svc.cluster.local:8080/mcp
+    timeout: 120
+  - name: acs-mcp
+    url: https://acs-mcp-server-stackrox-mcp.acs-mcp.svc:443/mcp
+    timeout: 120
 
 agentic:
   enabled: true
