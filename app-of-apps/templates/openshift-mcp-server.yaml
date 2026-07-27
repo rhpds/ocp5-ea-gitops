@@ -9,6 +9,11 @@ spec:
       name: mcp-config
       jsonPointers:
         - /data
+    - group: apps
+      kind: Deployment
+      name: openshift-mcp-server
+      jsonPointers:
+        - /spec/template/spec/containers/0/args
   destination:
     namespace: {{ .Values.openshiftMcpServer.namespace }}
     server: https://kubernetes.default.svc
