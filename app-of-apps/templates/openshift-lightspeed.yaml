@@ -9,6 +9,11 @@ spec:
       name: alerts-adapter-config
       jsonPointers:
         - /data
+    - group: ols.openshift.io
+      kind: OLSConfig
+      name: cluster
+      jsonPointers:
+        - /spec/mcpServers
   destination:
     namespace: {{ .Values.openshiftAgenticLightspeed.namespace }}
     server: https://kubernetes.default.svc

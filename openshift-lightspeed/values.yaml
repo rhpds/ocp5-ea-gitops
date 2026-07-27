@@ -25,9 +25,6 @@ mcpServers:
   - name: openshift-mcp
     url: http://openshift-mcp-server.openshift-mcp.svc.cluster.local:8080/mcp
     timeout: 120
-  - name: acs-mcp
-    url: https://acs-mcp-server-stackrox-mcp.acs-mcp.svc:443/mcp
-    timeout: 120
 
 agentic:
   enabled: true
