@@ -14,9 +14,8 @@ spec:
   parentRefs:
     - name: {{ $.Values.gateway.name }}
       namespace: {{ $.Values.gateway.namespace }}
-      sectionName: mcp-tls
   hostnames:
-    - '{{ .name }}.mcp-gw.{{ $.Values.gateway.clusterSubdomain }}'
+    - '{{ .name }}.mcp.internal'
   rules:
     - matches:
         - path:
