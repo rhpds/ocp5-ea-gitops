@@ -29,8 +29,6 @@ spec:
           image: {{ .Values.agentic.operatorImage }}
           args:
             - --namespace={{ .Values.namespace }}
-            - --sandbox-mode={{ .Values.agentic.sandboxMode }}
-            - --agentic-sandbox-image={{ .Values.agentic.sandboxImage }}
           ports:
             - containerPort: 8080
               name: metrics
