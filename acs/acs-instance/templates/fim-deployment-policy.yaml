@@ -13,6 +13,10 @@ spec:
   lifecycleStages:
     - RUNTIME
   eventSource: DEPLOYMENT_EVENT
+  exclusions:
+    - deployment:
+        scope:
+          namespace: openshift-.*
   severity: LOW_SEVERITY
   policySections:
     - sectionName: Rule 1
