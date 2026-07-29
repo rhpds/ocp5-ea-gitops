@@ -1,10 +1,10 @@
-{{- if .Values.auth.clusterSubdomain }}
+{{- if .Values.gateway.clusterSubdomain }}
 ---
 apiVersion: kuadrant.io/v1
 kind: AuthPolicy
 metadata:
   name: mcp-tool-auth-policy
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ .Values.gateway.namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "3"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
@@ -13,13 +13,12 @@ spec:
     group: gateway.networking.k8s.io
     kind: Gateway
     name: {{ .Values.gateway.name }}
-    namespace: {{ .Values.gateway.namespace }}
     sectionName: mcps
   rules:
     authentication:
       keycloak-jwt:
         jwt:
-          issuerUrl: https://sso.{{ .Values.auth.clusterSubdomain }}/realms/{{ .Values.auth.realm }}
+          issuerUrl: https://sso.{{ .Values.gateway.clusterSubdomain }}/realms/{{ .Values.keycloak.realm }}
         credentials:
           authorizationHeader:
             prefix: Bearer
