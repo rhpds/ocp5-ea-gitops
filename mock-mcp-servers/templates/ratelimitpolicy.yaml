@@ -19,5 +19,5 @@ spec:
         - limit: 30
           window: 1m
       counters:
-        - auth.identity.sub
+        - expression: auth.identity.sub
 {{- end }}
