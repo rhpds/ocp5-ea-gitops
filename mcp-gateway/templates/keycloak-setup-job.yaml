@@ -49,6 +49,12 @@ spec:
                 -d "grant_type=password&client_id=admin-cli&username=${ADMIN_USER}&password=${ADMIN_PASS}" | \
                 python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
 
+              # Set access token lifespan to 8 hours for EAP testing
+              curl -sk -X PUT "${SSO_URL}/admin/realms/${REALM}" \
+                -H "Authorization: Bearer ${ADMIN_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d '{"accessTokenLifespan": 28800}'
+
               # Create MCP client if it doesn't exist
               EXISTING=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/clients?clientId=${CLIENT_ID}" \
                 -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
