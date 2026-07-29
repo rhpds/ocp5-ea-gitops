@@ -18,6 +18,8 @@ spec:
       - header
     scopesSupported:
       - openid
+      - roles
+      - groups
 {{- end }}
   targetRef:
     group: gateway.networking.k8s.io
