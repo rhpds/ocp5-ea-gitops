@@ -11,13 +11,13 @@ spec:
   gatewayClassName: {{ .Values.gateway.gatewayClassName }}
   listeners:
     - name: mcp-tls
-      hostname: mcp.{{ .Values.gateway.clusterSubdomain }}
+      hostname: "*.mcp-gw.{{ .Values.gateway.clusterSubdomain }}"
       port: 443
       protocol: HTTPS
       tls:
         mode: Terminate
         certificateRefs:
-          - name: mcp-gateway-tls
+          - name: mcp-gateway-tls-selfsigned
       allowedRoutes:
         namespaces:
           from: All

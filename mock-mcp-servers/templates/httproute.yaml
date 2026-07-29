@@ -16,7 +16,7 @@ spec:
       namespace: {{ $.Values.gateway.namespace }}
       sectionName: mcp-tls
   hostnames:
-    - 'mcp.{{ $.Values.gateway.clusterSubdomain }}'
+    - '{{ .name }}.mcp-gw.{{ $.Values.gateway.clusterSubdomain }}'
   rules:
     - matches:
         - path:
