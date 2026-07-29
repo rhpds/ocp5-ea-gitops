@@ -1,4 +1,32 @@
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: enable-acs-console-plugin
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: enable-acs-console-plugin
+rules:
+  - apiGroups: ["operator.openshift.io"]
+    resources: ["consoles"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: enable-acs-console-plugin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: enable-acs-console-plugin
+subjects:
+  - kind: ServiceAccount
+    name: enable-acs-console-plugin
+    namespace: {{ .Release.Namespace }}
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -11,7 +39,7 @@ metadata:
 spec:
   template:
     spec:
-      serviceAccountName: cluster-registration-secret-generator
+      serviceAccountName: enable-acs-console-plugin
       restartPolicy: OnFailure
       securityContext:
         runAsNonRoot: true
