@@ -10,3 +10,8 @@ metadata:
 spec:
   observability:
     enable: true
+    tracing:
+      defaultEndpoint: http://jaeger.mock-mcp-servers.svc:4318
+      insecure: true
+    dataPlane:
+      httpHeaderIdentifier: x-request-id
