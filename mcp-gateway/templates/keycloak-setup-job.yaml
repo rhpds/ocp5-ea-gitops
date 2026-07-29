@@ -56,13 +56,13 @@ spec:
                 -H "Content-Type: application/json" \
                 -d '{"accessTokenLifespan": 28800}'
 
-              # Helper: get or create client, return internal ID
+              # Helper: get or create client, return internal ID (logs to stderr)
               get_or_create_client() {
                 local CID="$1" PUBLIC="$2" SECRET="$3" DIRECT="$4" FULL_SCOPE="$5"
                 local EXISTING=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/clients?clientId=${CID}" \
                   -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d[0]['id'] if d else '')")
                 if [ -z "$EXISTING" ]; then
-                  echo "Creating client ${CID}..."
+                  echo "Creating client ${CID}..." >&2
                   curl -sk -X POST "${SSO_URL}/admin/realms/${REALM}/clients" \
                     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
                     -H "Content-Type: application/json" \
@@ -70,7 +70,7 @@ spec:
                   EXISTING=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/clients?clientId=${CID}" \
                     -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['id'])")
                 else
-                  echo "Client ${CID} already exists"
+                  echo "Client ${CID} already exists" >&2
                 fi
                 echo "$EXISTING"
               }
@@ -78,13 +78,14 @@ spec:
               # Helper: create client role if it doesn't exist
               create_client_role() {
                 local CLIENT_INTERNAL_ID="$1" ROLE_NAME="$2"
-                local EXISTS=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/clients/${CLIENT_INTERNAL_ID}/roles/${ROLE_NAME}" \
-                  -H "Authorization: Bearer ${ADMIN_TOKEN}" -o /dev/null -w '%{http_code}')
+                local ENCODED_ROLE=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${ROLE_NAME}', safe=''))")
+                local EXISTS=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/clients/${CLIENT_INTERNAL_ID}/roles/${ENCODED_ROLE}" \
+                  -H "Authorization: Bearer ${ADMIN_TOKEN}" -o /dev/null -w '%{http_code}' || true)
                 if [ "$EXISTS" != "200" ]; then
                   curl -sk -X POST "${SSO_URL}/admin/realms/${REALM}/clients/${CLIENT_INTERNAL_ID}/roles" \
                     -H "Authorization: Bearer ${ADMIN_TOKEN}" \
                     -H "Content-Type: application/json" \
-                    -d "{\"name\":\"${ROLE_NAME}\"}"
+                    -d "{\"name\":\"${ROLE_NAME}\"}" || true
                 fi
               }
 
