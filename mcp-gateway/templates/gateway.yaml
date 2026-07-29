@@ -17,7 +17,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: mcp-gateway-tls-selfsigned
+          - name: mcp-gateway-tls-serving
       allowedRoutes:
         namespaces:
           from: All
