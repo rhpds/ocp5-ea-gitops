@@ -14,5 +14,5 @@ spec:
     kind: ClusterIssuer
     group: cert-manager.io
   dnsNames:
-    - "*.mcp.{{ .Values.gateway.clusterSubdomain }}"
+    - mcp.{{ .Values.gateway.clusterSubdomain }}
 {{- end }}

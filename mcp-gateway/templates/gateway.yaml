@@ -10,14 +10,17 @@ metadata:
 spec:
   gatewayClassName: {{ .Values.gateway.gatewayClassName }}
   listeners:
-    - name: mcp-tls
-      hostname: "*.mcp.{{ .Values.gateway.clusterSubdomain }}"
-      port: 443
-      protocol: HTTPS
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: mcp-gateway-tls
+    - name: mcp
+      hostname: mcp.{{ .Values.gateway.clusterSubdomain }}
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: mcps
+      hostname: "*.mcp.internal"
+      port: 80
+      protocol: HTTP
       allowedRoutes:
         namespaces:
           from: All
