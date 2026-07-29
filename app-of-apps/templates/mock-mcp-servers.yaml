@@ -3,6 +3,11 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 {{ include "app-of-apps.metadata" (dict "name" .Values.mockMcpServers.name "namespace" .Values.argocd.namespace "syncWave" "2") }}
 spec:
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
   destination:
     namespace: {{ .Values.mockMcpServers.namespace }}
     server: https://kubernetes.default.svc
