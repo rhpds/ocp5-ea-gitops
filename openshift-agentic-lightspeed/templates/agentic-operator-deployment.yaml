@@ -27,6 +27,7 @@ spec:
       containers:
         - name: manager
           image: {{ .Values.agentic.operatorImage }}
+          imagePullPolicy: Always
           args:
             - --namespace={{ .Values.namespace }}
           ports:

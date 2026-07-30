@@ -18,5 +18,16 @@ spec:
           apiKey: {{ .Values.openshiftAgenticLightspeed.llm.apiKey }}
           provider: {{ .Values.openshiftAgenticLightspeed.llm.provider }}
           model: {{ .Values.openshiftAgenticLightspeed.llm.model }}
+  ignoreDifferences:
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+      name: lightspeed-agent-cluster-reader
+      jsonPointers:
+        - /subjects
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+      name: lightspeed-agent-monitoring-view
+      jsonPointers:
+        - /subjects
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}

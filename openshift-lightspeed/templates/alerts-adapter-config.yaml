@@ -72,7 +72,7 @@ data:
         skills:
           - image: quay.io/openshiftanalytics/agentic-skills:latest
             paths:
-              - /skills/cluster-troubleshoot
+              - /skills/cluster-troubleshoot/investigate-alert
     # execution:
     #   tools:
     #     skills:
