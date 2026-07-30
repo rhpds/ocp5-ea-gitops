@@ -1,5 +1,5 @@
 inventory:
   replicas: 3
-  image: registry.redhat.io/ubi9/ubi9:latest
+  image: registry.redhat.io/ubi9/ubi:laetst
   pdb:
     minAvailable: 2
