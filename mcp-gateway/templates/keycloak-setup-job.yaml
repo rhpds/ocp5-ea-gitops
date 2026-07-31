@@ -136,6 +136,20 @@ spec:
                 echo "Added roles scope to mcp-gateway client"
               fi
 
+              # ── Add 'basic' as default scope so tokens include the 'sub' claim ──
+              BASIC_SCOPE_ID=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/client-scopes" \
+                -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "
+              import sys,json
+              for s in json.load(sys.stdin):
+                  if s['name'] == 'basic':
+                      print(s['id']); break
+              ")
+              if [ -n "$BASIC_SCOPE_ID" ]; then
+                curl -sk -X PUT "${SSO_URL}/admin/realms/${REALM}/clients/${GATEWAY_INTERNAL_ID}/default-client-scopes/${BASIC_SCOPE_ID}" \
+                  -H "Authorization: Bearer ${ADMIN_TOKEN}" 2>/dev/null || true
+                echo "Added basic scope to mcp-gateway client"
+              fi
+
               # ── Create server clients and tool roles ──
               {{- range .Values.keycloak.servers }}
               SERVER_CLIENT_ID="${SERVER_NS}/{{ .name }}"

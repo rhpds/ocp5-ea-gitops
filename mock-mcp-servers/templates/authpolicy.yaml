@@ -21,4 +21,12 @@ spec:
         credentials:
           authorizationHeader:
             prefix: Bearer
+    response:
+      success:
+        filters:
+          identity:
+            json:
+              properties:
+                sub:
+                  expression: auth.identity.sub
 {{- end }}
