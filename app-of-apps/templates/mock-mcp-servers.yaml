@@ -8,6 +8,11 @@ spec:
       kind: Deployment
       jsonPointers:
         - /spec/replicas
+    - group: kuadrant.io
+      kind: RateLimitPolicy
+      name: mcp-gateway-ratelimit
+      jsonPointers:
+        - /spec/limits
   destination:
     namespace: {{ .Values.mockMcpServers.namespace }}
     server: https://kubernetes.default.svc
