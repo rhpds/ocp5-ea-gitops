@@ -5,13 +5,13 @@ gitops:
 argocd:
   namespace: openshift-gitops
 
-# Placeholder for future operator version pinning via frozen OLM catalog snapshot
+# OLM catalog snapshot — v5.0 index dropped several operators we depend on
 catalogSource:
-  enabled: false
-  name: redhat-operators-snapshot
+  enabled: true
+  name: redhat-operators-v422
   namespace: openshift-marketplace
-  image: quay.io/gpte-devops-automation/olm_snapshot_redhat_catalog
-  tag: v4.20_2026_02_11
+  image: quay.io/rhpds/olm_snapshot_redhat_catalog
+  tag: v4.22_2026_08_03
 
 cluster:
   subdomain: ""
@@ -67,15 +67,6 @@ mockMcpServers:
   name: mock-mcp-servers
   namespace: mock-mcp-servers
 
-teamAMcp:
-  enabled: true
-  name: team-a-mcp
-  namespace: team-a-mcp
-
-teamBMcp:
-  enabled: true
-  name: team-b-mcp
-  namespace: team-b-mcp
 
 openshiftLightspeedTroubleshooting:
   enabled: true
