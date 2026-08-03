@@ -12,6 +12,8 @@ spec:
     targetRevision: main
     path: charts/stackrox-mcp
     helm:
+      apiVersions:
+        - route.openshift.io/v1
       valuesObject:
         config:
           central:
