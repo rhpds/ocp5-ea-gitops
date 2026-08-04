@@ -11,7 +11,7 @@ metadata:
   name: agentic-updates-builder
 rules:
   - apiGroups: ["build.openshift.io"]
-    resources: ["builds", "buildconfigs", "buildconfigs/instantiate"]
+    resources: ["builds", "buildconfigs", "buildconfigs/instantiate", "buildconfigs/instantiatebinary"]
     verbs: ["get", "list", "create", "update"]
   - apiGroups: ["image.openshift.io"]
     resources: ["imagestreams", "imagestreamtags"]
