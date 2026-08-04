@@ -69,32 +69,37 @@ spec:
               # ── Step 2: Build CVO (needs skills image ref) ──
               echo "=== Building patched CVO ==="
               CLUSTER_VERSION=$(oc get clusterversion version -o jsonpath='{.status.desired.version}')
-              CVO_POD=$(oc get pod -n openshift-cluster-version -l k8s-app=cluster-version-operator -o jsonpath='{.items[0].metadata.name}')
-              ORIGINAL_CVO_IMAGE=$(oc get deployment cluster-version-operator -n openshift-cluster-version -o jsonpath='{.spec.template.spec.containers[0].image}')
+              # Get the original release image from clusterversion history (not the current deployment, which may already be patched)
+              ORIGINAL_CVO_IMAGE=$(oc get clusterversion version -o jsonpath='{.status.history[?(@.state=="Completed")].image}' | tr ' ' '\n' | grep 'quay.io' | head -1)
+              if [ -z "$ORIGINAL_CVO_IMAGE" ]; then
+                echo "ERROR: Could not find original release image in clusterversion history"
+                exit 1
+              fi
+              echo "Original CVO image: ${ORIGINAL_CVO_IMAGE}"
 
               BUILDDIR=$(mktemp -d)
 
-              # Extract and patch image-references
-              oc exec -n openshift-cluster-version "${CVO_POD}" -- cat /release-manifests/image-references > "${BUILDDIR}/image-references-original"
-
-              python3 -c "
-              import json, os
-              with open('${BUILDDIR}/image-references-original') as f:
+              # Create patch script — runs inside the Dockerfile build (avoids oc exec into CVO pod)
+              cat > "${BUILDDIR}/patch-image-references.py" <<'PYSCRIPT'
+              import json, os, sys
+              with open(sys.argv[1]) as f:
                   data = json.load(f)
+              skills = os.environ['SKILLS_IMAGE']
               existing = [t['name'] for t in data['spec']['tags']]
               if 'agentic-skills' not in existing:
                   data['spec']['tags'].append({
                       'name': 'agentic-skills',
-                      'from': {'kind': 'DockerImage', 'name': '${SKILLS_IMAGE}'},
+                      'from': {'kind': 'DockerImage', 'name': skills},
                       'generation': None,
                       'importPolicy': {},
                       'referencePolicy': {'type': ''}
                   })
-              with open('${BUILDDIR}/image-references', 'w') as f:
+              with open(sys.argv[2], 'w') as f:
                   json.dump(data, f)
-              "
+              PYSCRIPT
+              sed -i 's/^              //' "${BUILDDIR}/patch-image-references.py"
 
-              # Generate Dockerfile
+              # Generate Dockerfile — all patching happens inside the build
               cat > "${BUILDDIR}/Dockerfile" <<DOCKERFILE
               FROM registry.access.redhat.com/ubi9/go-toolset:latest AS builder
               USER root
@@ -107,8 +112,11 @@ spec:
               FROM ${ORIGINAL_CVO_IMAGE} AS stock
 
               FROM builder AS patcher
+              COPY --from=stock /release-manifests/image-references /tmp/image-references-original
               COPY --from=stock /release-manifests/release-metadata /tmp/release-metadata
-              COPY image-references /tmp/image-references-patched
+              COPY patch-image-references.py /tmp/patch-image-references.py
+              ENV SKILLS_IMAGE=${SKILLS_IMAGE}
+              RUN python3 /tmp/patch-image-references.py /tmp/image-references-original /tmp/image-references-patched
 
               FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
               COPY --from=builder /build/_output/linux/amd64/cluster-version-operator /build/_output/linux/amd64/cluster-version-operator-tests.gz /usr/bin/
