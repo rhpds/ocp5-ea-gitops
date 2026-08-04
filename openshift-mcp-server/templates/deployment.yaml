@@ -25,7 +25,7 @@ spec:
         - name: {{ .Values.name }}
           image: {{ .Values.image }}
           command: ["/openshift-mcp-server"]
-          args: ["--config", "/etc/mcp/config.toml"]
+          args: ["--config", "/etc/mcp/config.toml", "--read-only", "--disable-destructive"]
           ports:
             - containerPort: 8080
           securityContext:
