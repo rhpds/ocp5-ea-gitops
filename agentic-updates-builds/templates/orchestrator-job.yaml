@@ -90,18 +90,7 @@ spec:
               BUILDDIR=$(mktemp -d)
 
               # Create patch script — runs inside the Dockerfile build (avoids oc exec into CVO pod)
-              cat > "${BUILDDIR}/patch-image-references.py" <<'PYSCRIPT'
-import json, os, sys
-data = json.load(open(sys.argv[1]))
-tags = {t['name']: t for t in data['spec']['tags']}
-for name, env_var in [('agentic-skills', 'SKILLS_IMAGE'), ('cluster-update-console-plugin', 'CONSOLE_IMAGE')]:
-    img = os.environ[env_var]
-    if name in tags:
-        tags[name]['from']['name'] = img
-    else:
-        data['spec']['tags'].append({'name': name, 'from': {'kind': 'DockerImage', 'name': img}, 'generation': None, 'importPolicy': {}, 'referencePolicy': {'type': ''}})
-json.dump(data, open(sys.argv[2], 'w'))
-PYSCRIPT
+              printf '%s\n' 'import json,os,sys' 'data=json.load(open(sys.argv[1]))' 'tags={t["name"]:t for t in data["spec"]["tags"]}' 'for n,e in [("agentic-skills","SKILLS_IMAGE"),("cluster-update-console-plugin","CONSOLE_IMAGE")]:' '  img=os.environ[e]' '  if n in tags: tags[n]["from"]["name"]=img' '  else: data["spec"]["tags"].append({"name":n,"from":{"kind":"DockerImage","name":img},"generation":None,"importPolicy":{},"referencePolicy":{"type":""}})' 'json.dump(data,open(sys.argv[2],"w"))' > "${BUILDDIR}/patch-image-references.py"
 
               # Generate Dockerfile — all patching happens inside the build
               cat > "${BUILDDIR}/Dockerfile" <<DOCKERFILE
