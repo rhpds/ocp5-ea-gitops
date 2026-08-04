@@ -11,5 +11,15 @@ spec:
     path: agentic-updates-builds
     repoURL: {{ .Values.gitops.repoURL }}
     targetRevision: {{ .Values.gitops.targetRevision }}
+  ignoreDifferences:
+    - group: build.openshift.io
+      kind: BuildConfig
+      jsonPointers:
+        - /spec/failedBuildsHistoryLimit
+        - /spec/successfulBuildsHistoryLimit
+        - /spec/runPolicy
+        - /spec/nodeSelector
+        - /spec/postCommit
+        - /spec/resources
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}
