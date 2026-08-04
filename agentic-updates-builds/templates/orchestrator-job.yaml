@@ -58,15 +58,25 @@ spec:
                 oc get imagestream "$1" -n "$NS" -o jsonpath='{.status.tags[?(@.tag=="latest")].items[0].dockerImageReference}'
               }
 
-              # ── Step 1: Build agentic-skills ──
-              echo "=== Building agentic-skills ==="
+              # ── Step 1: Build agentic-skills and console plugins (parallel) ──
+              echo "=== Building agentic-skills and console plugins ==="
               oc start-build agentic-skills -n "$NS"
+              oc start-build agentic-console -n "$NS"
+              oc start-build cluster-update-console -n "$NS"
               sleep 5
-              wait_for_build "$(get_latest_build agentic-skills)"
+              wait_for_build "$(get_latest_build agentic-skills)" &
+              PID1=$!
+              wait_for_build "$(get_latest_build agentic-console)" 600 &
+              PID2=$!
+              wait_for_build "$(get_latest_build cluster-update-console)" 600 &
+              PID3=$!
+              wait $PID1 $PID2 $PID3
               SKILLS_IMAGE=$(get_image_ref agentic-skills)
+              CLUSTER_UPDATE_CONSOLE_IMAGE=$(get_image_ref cluster-update-console-plugin)
               echo "Skills image: ${SKILLS_IMAGE}"
+              echo "Cluster update console image: ${CLUSTER_UPDATE_CONSOLE_IMAGE}"
 
-              # ── Step 2: Build CVO (needs skills image ref) ──
+              # ── Step 2: Build CVO (needs skills + console plugin image refs) ──
               echo "=== Building patched CVO ==="
               CLUSTER_VERSION=$(oc get clusterversion version -o jsonpath='{.status.desired.version}')
               # Get the original release image from clusterversion history (not the current deployment, which may already be patched)
@@ -84,16 +94,21 @@ spec:
               import json, os, sys
               with open(sys.argv[1]) as f:
                   data = json.load(f)
-              skills = os.environ['SKILLS_IMAGE']
               existing = [t['name'] for t in data['spec']['tags']]
-              if 'agentic-skills' not in existing:
-                  data['spec']['tags'].append({
-                      'name': 'agentic-skills',
-                      'from': {'kind': 'DockerImage', 'name': skills},
-                      'generation': None,
-                      'importPolicy': {},
-                      'referencePolicy': {'type': ''}
-                  })
+              for name, env_var in [('agentic-skills', 'SKILLS_IMAGE'), ('cluster-update-console-plugin', 'CONSOLE_IMAGE')]:
+                  image = os.environ[env_var]
+                  if name in existing:
+                      for t in data['spec']['tags']:
+                          if t['name'] == name:
+                              t['from']['name'] = image
+                  else:
+                      data['spec']['tags'].append({
+                          'name': name,
+                          'from': {'kind': 'DockerImage', 'name': image},
+                          'generation': None,
+                          'importPolicy': {},
+                          'referencePolicy': {'type': ''}
+                      })
               with open(sys.argv[2], 'w') as f:
                   json.dump(data, f)
               PYSCRIPT
@@ -116,6 +131,7 @@ spec:
               COPY --from=stock /release-manifests/release-metadata /tmp/release-metadata
               COPY patch-image-references.py /tmp/patch-image-references.py
               ENV SKILLS_IMAGE=${SKILLS_IMAGE}
+              ENV CONSOLE_IMAGE=${CLUSTER_UPDATE_CONSOLE_IMAGE}
               RUN python3 /tmp/patch-image-references.py /tmp/image-references-original /tmp/image-references-patched
 
               FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
@@ -135,17 +151,6 @@ spec:
               oc start-build cvo-patched -n "$NS" --from-dir="${BUILDDIR}"
               sleep 5
               wait_for_build "$(get_latest_build cvo-patched)" 900
-
-              # ── Step 3: Build console plugins (parallel) ──
-              echo "=== Building console plugins ==="
-              oc start-build agentic-console -n "$NS"
-              oc start-build cluster-update-console -n "$NS"
-              sleep 5
-              wait_for_build "$(get_latest_build agentic-console)" 600 &
-              PID1=$!
-              wait_for_build "$(get_latest_build cluster-update-console)" 600 &
-              PID2=$!
-              wait $PID1 $PID2
 
               # ── Step 4: Grant image-puller access ──
               echo "=== Granting image-puller access ==="
