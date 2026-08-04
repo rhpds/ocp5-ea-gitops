@@ -174,7 +174,7 @@ spec:
               oc set image deployment/cluster-update-console-plugin \
                 -n openshift-cluster-update-console-plugin plugin="${CLUSTER_UPDATE_IMAGE}"
 
-              oc rollout status deployment/lightspeed-agentic-console-plugin -n "$NS" --timeout=60s
-              oc rollout status deployment/cluster-update-console-plugin -n openshift-cluster-update-console-plugin --timeout=60s
+              oc rollout status deployment/lightspeed-agentic-console-plugin -n "$NS" --timeout=180s
+              oc rollout status deployment/cluster-update-console-plugin -n openshift-cluster-update-console-plugin --timeout=180s
 
               echo "=== All builds and deployments complete ==="
