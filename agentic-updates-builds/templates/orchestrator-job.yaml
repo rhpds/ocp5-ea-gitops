@@ -91,28 +91,17 @@ spec:
 
               # Create patch script — runs inside the Dockerfile build (avoids oc exec into CVO pod)
               cat > "${BUILDDIR}/patch-image-references.py" <<'PYSCRIPT'
-              import json, os, sys
-              with open(sys.argv[1]) as f:
-                  data = json.load(f)
-              existing = [t['name'] for t in data['spec']['tags']]
-              for name, env_var in [('agentic-skills', 'SKILLS_IMAGE'), ('cluster-update-console-plugin', 'CONSOLE_IMAGE')]:
-                  image = os.environ[env_var]
-                  if name in existing:
-                      for t in data['spec']['tags']:
-                          if t['name'] == name:
-                              t['from']['name'] = image
-                  else:
-                      data['spec']['tags'].append({
-                          'name': name,
-                          'from': {'kind': 'DockerImage', 'name': image},
-                          'generation': None,
-                          'importPolicy': {},
-                          'referencePolicy': {'type': ''}
-                      })
-              with open(sys.argv[2], 'w') as f:
-                  json.dump(data, f)
-              PYSCRIPT
-              sed -i 's/^              //' "${BUILDDIR}/patch-image-references.py"
+import json, os, sys
+data = json.load(open(sys.argv[1]))
+tags = {t['name']: t for t in data['spec']['tags']}
+for name, env_var in [('agentic-skills', 'SKILLS_IMAGE'), ('cluster-update-console-plugin', 'CONSOLE_IMAGE')]:
+    img = os.environ[env_var]
+    if name in tags:
+        tags[name]['from']['name'] = img
+    else:
+        data['spec']['tags'].append({'name': name, 'from': {'kind': 'DockerImage', 'name': img}, 'generation': None, 'importPolicy': {}, 'referencePolicy': {'type': ''}})
+json.dump(data, open(sys.argv[2], 'w'))
+PYSCRIPT
 
               # Generate Dockerfile — all patching happens inside the build
               cat > "${BUILDDIR}/Dockerfile" <<DOCKERFILE
