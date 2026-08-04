@@ -10,6 +10,12 @@ spec:
       namespace: payments
       jsonPointers:
         - /spec/template/spec/containers/0/image
+    - group: apps
+      kind: Deployment
+      name: inventory-app
+      namespace: inventory
+      jsonPointers:
+        - /spec/template/spec/containers/0/image
   destination:
     namespace: {{ .Values.openshiftLightspeedTroubleshooting.namespace }}
     server: https://kubernetes.default.svc
