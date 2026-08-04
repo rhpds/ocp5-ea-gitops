@@ -1,7 +1,7 @@
 namespace: openshift-lightspeed
 
 images:
-  operator: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-operator@sha256:18ba78e3610cfd80cfd69ae2e300d726a0e5a00010aec1bd2fd1ab4e1118136b
+  operator: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-operator@sha256:b5175e14c587016d83ed9590c91f3648b42f7b72dea390f639e9afb074afc1fc
   serviceApi: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-service@sha256:55d2becda14642064be4ffde695744243cf4a5a7c0c545695782cf95c9d6ca9e
   consolePlugin: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/ols/lightspeed-console@sha256:abc8816ab7681a045dba349688fb26755a772045770327cfe41dae11475dabec
   postgres: registry.redhat.io/rhel9/postgresql-16@sha256:42f385ac3c9b8913426da7c57e70bc6617cd237aaf697c667f6385a8c0b0118b
