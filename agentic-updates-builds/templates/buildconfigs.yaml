@@ -39,28 +39,6 @@ spec:
 apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
-  name: agentic-console
-  namespace: {{ .Values.namespace }}
-spec:
-  output:
-    to:
-      kind: ImageStreamTag
-      name: lightspeed-agentic-console:latest
-  source:
-    type: Git
-    git:
-      uri: {{ .Values.git.agenticConsole.uri }}
-      ref: {{ .Values.git.agenticConsole.ref }}
-  strategy:
-    type: Docker
-    dockerStrategy:
-      dockerfilePath: Dockerfile
-  resources:
-    {{- toYaml .Values.build.resources | nindent 4 }}
----
-apiVersion: build.openshift.io/v1
-kind: BuildConfig
-metadata:
   name: cluster-update-console
   namespace: {{ .Values.namespace }}
 spec:

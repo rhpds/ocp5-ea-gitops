@@ -7,9 +7,6 @@ git:
   cvo:
     uri: https://github.com/openshift/cluster-version-operator.git
     ref: main
-  agenticConsole:
-    uri: https://github.com/openshift/lightspeed-agentic-console.git
-    ref: main
   clusterUpdateConsole:
     uri: https://github.com/openshift/cluster-update-console-plugin.git
     ref: main
