@@ -7,7 +7,7 @@ images:
   postgres: registry.redhat.io/rhel9/postgresql-16@sha256:42f385ac3c9b8913426da7c57e70bc6617cd237aaf697c667f6385a8c0b0118b
   mcpServer: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/openshift-mcp-server@sha256:e7626fae901d8855922cf77ab71ea6ce22f3ce15d32184632ac5985d359afd68
   dataverseExporter: registry.redhat.io/lightspeed-core/dataverse-exporter-rhel9@sha256:1c7ffaead23adfb1dc6bd3adfe75c80f284d6d31f13ca427d754703c78514cb2
-  agenticConsole: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-console@sha256:8c7cf42aae72da51445674238dc32ced27895628773520049e102e084546e330
+  agenticConsole: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-console@sha256:300cf7c966df5ccbb04fbbdcc8d4e162a05ae76f056e96b6846a760d3f3d237c
   alertsAdapter: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-alerts-adapter@sha256:10af58d31ab3add2e6ec1058ba5d10a87e2d5a4d77258b3f47a0ffc84eff3770
   otelCollector: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-otel-collector@sha256:fb86a2c82c959e8ec72e707ce6cc0c4005f806da38ec50da5606557346549cd3
   rhokp: registry.redhat.io/offline-knowledge-portal/rhokp-rhel9:latest
