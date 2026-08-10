@@ -68,6 +68,11 @@ mockMcpServers:
   namespace: mock-mcp-servers
 
 
+consoleBuild:
+  enabled: true
+  name: console-build
+  namespace: console-build
+
 openshiftLightspeedTroubleshooting:
   enabled: true
   name: openshift-lightspeed-troubleshooting

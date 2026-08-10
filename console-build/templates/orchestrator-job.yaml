@@ -1,0 +1,91 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: console-build-orchestrator
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  activeDeadlineSeconds: 1800
+  template:
+    metadata:
+      labels:
+        app: console-build-orchestrator
+    spec:
+      serviceAccountName: console-builder
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: orchestrator
+          image: registry.redhat.io/openshift4/ose-cli-rhel9:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              NS="{{ .Values.namespace }}"
+
+              wait_for_build() {
+                local name="$1"
+                local timeout="${2:-900}"
+                echo "Waiting for build ${name} (timeout ${timeout}s)..."
+                local elapsed=0
+                while [ $elapsed -lt $timeout ]; do
+                  local phase=$(oc get build "${name}" -n "$NS" -o jsonpath='{.status.phase}' 2>/dev/null || echo "Unknown")
+                  case "$phase" in
+                    Complete) echo "Build ${name} completed"; return 0 ;;
+                    Failed|Error|Cancelled) echo "Build ${name} failed: ${phase}"; return 1 ;;
+                    *) sleep 10; elapsed=$((elapsed + 10)) ;;
+                  esac
+                done
+                echo "Build ${name} timed out after ${timeout}s"
+                return 1
+              }
+
+              # ── Step 1: Clone and patch Dockerfile ──
+              echo "=== Cloning console source ==="
+              BUILDDIR=$(mktemp -d)
+              git clone --depth 1 {{ .Values.git.uri }} -b {{ .Values.git.ref }} "${BUILDDIR}/console"
+
+              echo "=== Patching Dockerfile ==="
+              cd "${BUILDDIR}/console"
+              sed -i \
+                -e 's|registry.ci.openshift.org/ocp/builder:rhel-9-golang-[^ ]*|registry.access.redhat.com/ubi9/go-toolset:latest|' \
+                -e 's|registry.ci.openshift.org/ocp/builder:rhel-9-base-nodejs-[^ ]*|registry.access.redhat.com/ubi9/nodejs-22:latest|' \
+                -e 's|registry.ci.openshift.org/ocp/[^ ]*:base-rhel9|registry.access.redhat.com/ubi9/ubi-minimal:latest|' \
+                -e 's|ADD \. \.|RUN git clone --depth 1 {{ .Values.git.uri }} -b {{ .Values.git.ref }} /tmp/console \&\& cp -a /tmp/console/. .|' \
+                -e 's|ADD \. /go/src/github.com/openshift/console/|RUN true # source already cloned|' \
+                -e 's|container-entrypoint ||' \
+                Dockerfile
+
+              echo "=== Patched Dockerfile ==="
+              cat Dockerfile
+
+              # ── Step 2: Build ──
+              echo "=== Starting build ==="
+              oc start-build console -n "$NS" --from-dir="${BUILDDIR}/console"
+              sleep 5
+              BUILD_NAME=$(oc get builds -n "$NS" -l buildconfig=console --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1].metadata.name}')
+              wait_for_build "$BUILD_NAME" 900
+
+              # ── Step 3: Deploy ──
+              echo "=== Setting console operator to Unmanaged ==="
+              oc patch consoles.operator.openshift.io cluster --type merge \
+                -p '{"spec":{"managementState":"Unmanaged"}}'
+
+              CONSOLE_IMAGE=$(oc get imagestream console -n "$NS" -o jsonpath='{.status.tags[?(@.tag=="latest")].items[0].dockerImageReference}')
+              echo "Console image: ${CONSOLE_IMAGE}"
+
+              echo "=== Patching console deployment ==="
+              oc set image deploy console console="${CONSOLE_IMAGE}" -n openshift-console
+              oc rollout status deploy/console -n openshift-console --timeout=180s
+
+              echo "=== Console build and deploy complete ==="
