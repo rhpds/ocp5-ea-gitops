@@ -15,4 +15,3 @@ spec:
     type: Docker
   resources:
     {{- toYaml .Values.build.resources | nindent 4 }}
-  triggers: []
