@@ -37,7 +37,7 @@ spec:
 
               wait_for_build() {
                 local name="$1"
-                local timeout="${2:-900}"
+                local timeout="${2:-1500}"
                 echo "Waiting for build ${name} (timeout ${timeout}s)..."
                 local elapsed=0
                 while [ $elapsed -lt $timeout ]; do
@@ -88,7 +88,7 @@ spec:
               oc start-build console -n "$NS" --from-dir="${BUILDDIR}"
               sleep 5
               BUILD_NAME=$(oc get builds -n "$NS" -l buildconfig=console --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1].metadata.name}')
-              wait_for_build "$BUILD_NAME" 900
+              wait_for_build "$BUILD_NAME" 1500
 
               # ── Step 3: Deploy ──
               echo "=== Setting console operator to Unmanaged ==="
