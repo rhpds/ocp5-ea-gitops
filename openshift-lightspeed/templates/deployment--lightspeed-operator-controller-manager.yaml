@@ -37,6 +37,7 @@ spec:
         - --console-image={{ .Values.images.consolePlugin }}
         - --openshift-mcp-server-image={{ .Values.images.mcpServer }}
         - --agentic-console-image={{ .Values.images.agenticConsole }}
+        - --agentic-sandbox-image={{ .Values.images.agenticSandbox }}
         - --alerts-adapter-image={{ .Values.images.alertsAdapter }}
         - --otel-collector-image={{ .Values.images.otelCollector }}
         - --rhokp-image={{ .Values.images.rhokp }}
