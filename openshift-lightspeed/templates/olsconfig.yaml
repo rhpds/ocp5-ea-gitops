@@ -36,6 +36,10 @@ spec:
     logLevel: DEBUG
     defaultModel: {{ .Values.llm.model }}
     defaultProvider: {{ .Values.llm.provider }}
+    deployment: 
+      alertsAdapter:
+        configMapRef:
+          name: alerts-adapter-config
     conversationCache:
       type: postgres
       postgres:
