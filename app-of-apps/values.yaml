@@ -68,8 +68,10 @@ mockMcpServers:
   namespace: mock-mcp-servers
 
 
+# Custom console build — was needed for EC5 to pick up the virtualized table
+# layout fix (openshift/console#16798). Disabled since EC6 includes the fix.
 consoleBuild:
-  enabled: true
+  enabled: false
   name: console-build
   namespace: console-build
 
