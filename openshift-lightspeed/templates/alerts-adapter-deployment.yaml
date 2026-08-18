@@ -12,10 +12,18 @@ spec:
   selector:
     matchLabels:
       app: lightspeed-agentic-alerts-adapter
+      app.kubernetes.io/component: alerts-adapter
+      app.kubernetes.io/managed-by: lightspeed-operator
+      app.kubernetes.io/name: lightspeed-agentic-alerts-adapter
+      app.kubernetes.io/part-of: openshift-lightspeed
   template:
     metadata:
       labels:
         app: lightspeed-agentic-alerts-adapter
+        app.kubernetes.io/component: alerts-adapter
+        app.kubernetes.io/managed-by: lightspeed-operator
+        app.kubernetes.io/name: lightspeed-agentic-alerts-adapter
+        app.kubernetes.io/part-of: openshift-lightspeed
     spec:
       serviceAccountName: lightspeed-agentic-alerts-adapter
       securityContext:
