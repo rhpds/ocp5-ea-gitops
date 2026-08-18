@@ -8,7 +8,7 @@ images:
   mcpServer: registry.redhat.io/openshift-lightspeed/openshift-mcp-server-rhel9@sha256:588577fec9f42aff4e3e4b3c7fdf1d1c6e2ead441978e25c0b7775b106d5baaf
   dataverseExporter: registry.redhat.io/lightspeed-core/dataverse-exporter-rhel9@sha256:1c7ffaead23adfb1dc6bd3adfe75c80f284d6d31f13ca427d754703c78514cb2
   agenticConsole: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-console:main
-  agenticSandbox: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-sandbox:main
+  agenticSandbox: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-sandbox@sha256:230d72bdb84c80f6cfebaa54eb2a1b9fc72098b405d46aaa38c7113803ba0ede
   alertsAdapter: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-alerts-adapter:main
   otelCollector: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-otel-collector:main
   rhokp: registry.redhat.io/offline-knowledge-portal/rhokp-rhel9@sha256:f46082f2dc2972582f3b85ed2a563b554d0aba3255ba2f00835e65f4929ae9a9
