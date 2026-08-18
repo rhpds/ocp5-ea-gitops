@@ -15,6 +15,13 @@ spec:
       jsonPointers:
         - /spec/mcpServers
         - /spec/ols/toolsApprovalConfig
+    - group: apps
+      kind: Deployment
+      name: lightspeed-agentic-alerts-adapter
+      jsonPointers:
+        - /spec/selector
+        - /spec/template/metadata/labels
+        - /spec/template/spec
   destination:
     namespace: {{ .Values.openshiftAgenticLightspeed.namespace }}
     server: https://kubernetes.default.svc
