@@ -10,7 +10,7 @@ images:
   # Pinned — :main crashes on EC6 console (React 18 / SDK incompatibility)
   agenticConsole: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-console@sha256:300cf7c966df5ccbb04fbbdcc8d4e162a05ae76f056e96b6846a760d3f3d237c
   agenticSandbox: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-sandbox@sha256:230d72bdb84c80f6cfebaa54eb2a1b9fc72098b405d46aaa38c7113803ba0ede
-  alertsAdapter: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-alerts-adapter:main
+  alertsAdapter: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-agentic-alerts-adapter@sha256:b7f208290d7509124961850efe87c69422b754a29b5249283f4f3430533fc8c3
   otelCollector: quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/lightspeed-otel-collector:main
   rhokp: registry.redhat.io/offline-knowledge-portal/rhokp-rhel9@sha256:f46082f2dc2972582f3b85ed2a563b554d0aba3255ba2f00835e65f4929ae9a9
 
