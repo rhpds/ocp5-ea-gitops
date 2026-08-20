@@ -1,6 +1,6 @@
 gitops:
   repoURL: https://github.com/rhpds/ocp5-ea-gitops.git
-  targetRevision: kiali-ossm
+  targetRevision: dev
 
 argocd:
   namespace: openshift-gitops
