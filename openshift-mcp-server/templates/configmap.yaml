@@ -28,3 +28,7 @@ data:
     [toolset_configs.netedge]
     auth_mode = "header"
     insecure = true
+
+    [toolset_configs.kiali]
+    url = "https://kiali.istio-system.svc.cluster.local:20001"
+    insecure = true

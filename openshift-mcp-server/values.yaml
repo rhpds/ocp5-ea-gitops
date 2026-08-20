@@ -9,6 +9,7 @@ toolsets:
   - metrics
   - netedge
   - openshift
+  - ossm
 
 users:
   - username: mcp-admin
