@@ -67,6 +67,11 @@ mockMcpServers:
   name: mock-mcp-servers
   namespace: mock-mcp-servers
 
+kialiOssm:
+  enabled: true
+  name: kiali-ossm
+  namespace: istio-system
+
 
 # Custom console build — was needed for EC5 to pick up the virtualized table
 # layout fix (openshift/console#16798). Disabled since EC6 includes the fix.

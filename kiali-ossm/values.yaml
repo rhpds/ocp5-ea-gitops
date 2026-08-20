@@ -1,0 +1,37 @@
+subscription:
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+
+operators:
+  namespace: openshift-operators
+
+tempo:
+  operatorNamespace: openshift-tempo-operator
+  namespace: tempo
+  subscription:
+    source: redhat-operators-v422
+
+istio:
+  namespace: istio-system
+  cniNamespace: istio-cni
+
+minio:
+  accessKeyId: minio
+  accessKeySecret: minio123
+  endpoint: "http://minio:9000"
+  secretName: tempostack-dev-minio
+  bucketName: tempo-data
+
+kiali:
+  version: default
+
+bookinfo:
+  enabled: true
+  namespace: bookinfo
+
+trafficGenerator:
+  enabled: true
+  rate: "1"
+
+eapPreconditions:
+  enabled: true
