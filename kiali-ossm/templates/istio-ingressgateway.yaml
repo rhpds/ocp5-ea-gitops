@@ -42,6 +42,7 @@ metadata:
   namespace: {{ .Values.istio.namespace }}
   labels:
     app: istio-ingressgateway
+    istio.io/rev: {{ .Values.istio.revision }}
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
@@ -55,6 +56,7 @@ spec:
       labels:
         app: istio-ingressgateway
         istio: ingressgateway
+        istio.io/rev: {{ .Values.istio.revision }}
     spec:
       containers:
       - name: istio-proxy
