@@ -24,22 +24,6 @@ spec:
       version: v3
 ---
 apiVersion: networking.istio.io/v1
-kind: DestinationRule
-metadata:
-  name: details
-  namespace: {{ $ns }}
-  labels:
-    eap.kiali.io/test: eap-preconditions
-  annotations:
-    argocd.argoproj.io/sync-wave: "5"
-spec:
-  host: details.{{ $ns }}.svc.cluster.local
-  subsets:
-  - name: v1
-    labels:
-      version: v1
----
-apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: reviews
@@ -65,30 +49,6 @@ spec:
         host: reviews.{{ $ns }}.svc.cluster.local
         subset: v3
       weight: 0
----
-apiVersion: networking.istio.io/v1
-kind: VirtualService
-metadata:
-  name: details
-  namespace: {{ $ns }}
-  labels:
-    eap.kiali.io/test: eap-preconditions
-  annotations:
-    argocd.argoproj.io/sync-wave: "5"
-spec:
-  hosts:
-  - details.{{ $ns }}.svc.cluster.local
-  http:
-  - route:
-    - destination:
-        host: details.{{ $ns }}.svc.cluster.local
-        subset: v1
-      weight: 100
-    fault:
-      abort:
-        percentage:
-          value: 100
-        httpStatus: 503
 ---
 apiVersion: batch/v1
 kind: Job
