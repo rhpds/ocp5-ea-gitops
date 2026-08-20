@@ -5,7 +5,7 @@ apiVersion: networking.istio.io/v1
 kind: Gateway
 metadata:
   name: bookinfo-gateway
-  namespace: {{ $ns }}
+  namespace: {{ $.Values.istio.namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "4"
 spec:
@@ -30,7 +30,7 @@ spec:
   hosts:
   - "*"
   gateways:
-  - bookinfo-gateway
+  - {{ $.Values.istio.namespace }}/bookinfo-gateway
   http:
   - match:
     - uri:
