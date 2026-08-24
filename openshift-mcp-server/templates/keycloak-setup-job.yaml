@@ -18,6 +18,7 @@ spec:
       restartPolicy: OnFailure
       securityContext:
         runAsNonRoot: true
+        runAsUser: 1000
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -28,6 +29,14 @@ spec:
             capabilities:
               drop:
                 - ALL
+          env:
+            {{- range .Values.users }}
+            - name: PASS_{{ .username | upper | replace "-" "_" }}
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-user-credentials
+                  key: {{ .username }}
+            {{- end }}
           command: ["/bin/bash", "-c"]
           args:
             - |
@@ -45,6 +54,7 @@ spec:
                 python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
 
               {{- range .Values.users }}
+              USER_PASS="${PASS_{{ .username | upper | replace "-" "_" }}}"
               EXISTING=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/users?username={{ .username }}&exact=true" \
                 -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
               if [ "$EXISTING" = "0" ]; then
@@ -52,7 +62,7 @@ spec:
                 curl -sk -X POST "${SSO_URL}/admin/realms/${REALM}/users" \
                   -H "Authorization: Bearer ${ADMIN_TOKEN}" \
                   -H "Content-Type: application/json" \
-                  -d '{"username":"{{ .username }}","enabled":true,"emailVerified":true,"email":"{{ .email }}","firstName":"{{ .firstName }}","lastName":"{{ .lastName }}","credentials":[{"type":"password","value":"{{ .password }}","temporary":false}]}'
+                  -d "{\"username\":\"{{ .username }}\",\"enabled\":true,\"emailVerified\":true,\"email\":\"{{ .email }}\",\"firstName\":\"{{ .firstName }}\",\"lastName\":\"{{ .lastName }}\",\"credentials\":[{\"type\":\"password\",\"value\":\"${USER_PASS}\",\"temporary\":false}]}"
                 echo "User {{ .username }} created"
               else
                 echo "User {{ .username }} already exists"

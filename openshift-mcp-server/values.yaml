@@ -13,13 +13,11 @@ toolsets:
 
 users:
   - username: mcp-admin
-    password: mcpadminpass
     email: mcp-admin@example.com
     firstName: MCP
     lastName: Admin
     clusterRole: cluster-admin
   - username: mcp-viewer
-    password: mcpviewerpass
     email: mcp-viewer@example.com
     firstName: MCP
     lastName: Viewer
