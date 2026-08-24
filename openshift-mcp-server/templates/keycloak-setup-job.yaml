@@ -64,7 +64,14 @@ spec:
                   -d "{\"username\":\"{{ .username }}\",\"enabled\":true,\"emailVerified\":true,\"email\":\"{{ .email }}\",\"firstName\":\"{{ .firstName }}\",\"lastName\":\"{{ .lastName }}\",\"credentials\":[{\"type\":\"password\",\"value\":\"${USER_PASS}\",\"temporary\":false}]}"
                 echo "User {{ .username }} created"
               else
-                echo "User {{ .username }} already exists"
+                echo "User {{ .username }} already exists, updating password..."
+                USER_ID=$(curl -sk "${SSO_URL}/admin/realms/${REALM}/users?username={{ .username }}&exact=true" \
+                  -H "Authorization: Bearer ${ADMIN_TOKEN}" | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['id'])")
+                curl -sk -X PUT "${SSO_URL}/admin/realms/${REALM}/users/${USER_ID}/reset-password" \
+                  -H "Authorization: Bearer ${ADMIN_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"type\":\"password\",\"value\":\"${USER_PASS}\",\"temporary\":false}"
+                echo "User {{ .username }} password updated"
               fi
               {{- end }}
 
