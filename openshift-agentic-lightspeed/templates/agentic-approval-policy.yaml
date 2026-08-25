@@ -12,7 +12,7 @@ spec:
   maxConcurrentRuns: 5
   stages:
     - name: Analysis
-      approval: Automatic
+      approval: Manual
     - name: Execution
       approval: Manual
     - name: Verification
