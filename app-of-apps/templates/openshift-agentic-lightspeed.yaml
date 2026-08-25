@@ -29,5 +29,10 @@ spec:
       name: lightspeed-agent-monitoring-view
       jsonPointers:
         - /subjects
+    - group: agentic.openshift.io
+      kind: ApprovalPolicy
+      name: cluster
+      jsonPointers:
+        - /spec/stages
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}
