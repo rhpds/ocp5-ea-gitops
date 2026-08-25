@@ -34,5 +34,15 @@ spec:
       name: cluster
       jsonPointers:
         - /spec/stages
+    - group: agentic.openshift.io
+      kind: LLMProvider
+      name: openai
+      jsonPointers:
+        - /spec
+    - group: ""
+      kind: Secret
+      name: llm-creds-openai
+      jsonPointers:
+        - /data
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}
