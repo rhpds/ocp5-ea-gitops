@@ -28,19 +28,13 @@ spec:
             capabilities:
               drop:
                 - ALL
-          env:
-            {{- range .Values.users }}
-            - name: PASS_{{ .username | upper | replace "-" "_" }}
-              valueFrom:
-                secretKeyRef:
-                  name: mcp-user-credentials
-                  key: {{ .username }}
-            {{- end }}
           command: ["/bin/bash", "-c"]
           args:
             - |
               set -eo pipefail
 
+              NAMESPACE="{{ .Release.Namespace }}"
+              SECRET_NAME="mcp-user-credentials"
               SSO_URL="https://sso.{{ .Values.clusterSubdomain }}"
               REALM="keycloak"
               echo "Keycloak URL: ${SSO_URL}"
@@ -51,6 +45,29 @@ spec:
               ADMIN_TOKEN=$(curl -sk -X POST "${SSO_URL}/realms/master/protocol/openid-connect/token" \
                 -d "grant_type=password&client_id=admin-cli&username=${ADMIN_USER}&password=${ADMIN_PASS}" | \
                 python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+              # Generate or retrieve passwords
+              generate_password() {
+                cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 16
+              }
+
+              if oc get secret "${SECRET_NAME}" -n "${NAMESPACE}" >/dev/null 2>&1; then
+                echo "Secret ${SECRET_NAME} exists, reading passwords..."
+                {{- range .Values.users }}
+                PASS_{{ .username | upper | replace "-" "_" }}=$(oc get secret "${SECRET_NAME}" -n "${NAMESPACE}" -o jsonpath='{.data.{{ .username }}}' | base64 -d)
+                {{- end }}
+              else
+                echo "Secret ${SECRET_NAME} does not exist, generating passwords..."
+                {{- range .Values.users }}
+                PASS_{{ .username | upper | replace "-" "_" }}=$(generate_password)
+                {{- end }}
+                oc create secret generic "${SECRET_NAME}" -n "${NAMESPACE}" \
+                  {{- range .Values.users }}
+                  --from-literal={{ .username }}="${PASS_{{ .username | upper | replace "-" "_" }}}" \
+                  {{- end }}
+                  --dry-run=client -o yaml | oc apply -f -
+                echo "Secret ${SECRET_NAME} created"
+              fi
 
               {{- range .Values.users }}
               USER_PASS="${PASS_{{ .username | upper | replace "-" "_" }}}"
@@ -112,4 +129,32 @@ subjects:
 roleRef:
   kind: Role
   name: keycloak-mcp-server-setup
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: keycloak-mcp-server-credentials
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: keycloak-mcp-server-credentials
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+subjects:
+  - kind: ServiceAccount
+    name: keycloak-mcp-server-setup
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: keycloak-mcp-server-credentials
   apiGroup: rbac.authorization.k8s.io
