@@ -48,7 +48,7 @@ spec:
 
               # Generate or retrieve passwords
               generate_password() {
-                cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 16
+                dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -dc 'a-zA-Z0-9' | head -c 16 || true
               }
 
               if oc get secret "${SECRET_NAME}" -n "${NAMESPACE}" >/dev/null 2>&1; then
