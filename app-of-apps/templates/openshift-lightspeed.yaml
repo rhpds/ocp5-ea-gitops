@@ -15,6 +15,8 @@ spec:
       jsonPointers:
         - /spec/llm
         - /spec/mcpServers
+        - /spec/ols/defaultProvider
+        - /spec/ols/defaultModel
         - /spec/ols/toolsApprovalConfig
     - group: ""
       kind: Secret
