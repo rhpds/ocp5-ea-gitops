@@ -13,8 +13,14 @@ spec:
       kind: OLSConfig
       name: cluster
       jsonPointers:
+        - /spec/llm
         - /spec/mcpServers
         - /spec/ols/toolsApprovalConfig
+    - group: ""
+      kind: Secret
+      name: llm-credentials
+      jsonPointers:
+        - /data
     - group: apps
       kind: Deployment
       name: lightspeed-agentic-alerts-adapter
