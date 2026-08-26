@@ -34,6 +34,7 @@ spec:
 {{- end }}
   ols:
     logLevel: DEBUG
+    maxIterations: 30
     defaultModel: {{ .Values.llm.model }}
     defaultProvider: {{ .Values.llm.provider }}
     deployment: 
