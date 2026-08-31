@@ -50,5 +50,11 @@ spec:
       jsonPointers:
         - /spec/llmProvider
         - /spec/model
+    - group: agentic.openshift.io
+      kind: Agent
+      name: smart
+      jsonPointers:
+        - /spec/llmProvider
+        - /spec/model
 {{ include "app-of-apps.syncPolicy" . | indent 2 }}
 {{- end }}
