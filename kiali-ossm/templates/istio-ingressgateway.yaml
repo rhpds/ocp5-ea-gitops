@@ -103,4 +103,7 @@ spec:
     name: istio-ingressgateway
   port:
     targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
 {{- end }}
