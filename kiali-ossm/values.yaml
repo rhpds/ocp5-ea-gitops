@@ -16,12 +16,12 @@ istio:
   cniNamespace: istio-cni
   revision: default-v1-30-4
 
-minio:
-  accessKeyId: minio
-  accessKeySecret: minio123
-  endpoint: "http://minio:9000"
-  secretName: tempostack-dev-minio
-  bucketName: tempo-data
+s4:
+  accessKeyId: s4admin
+  accessKeySecret: s4secret
+  endpoint: "http://s4:7480"
+  tempoSecretName: tempostack-dev-s4
+  bucketName: default
 
 addons:
   prometheus: true

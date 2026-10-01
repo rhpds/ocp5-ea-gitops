@@ -11,7 +11,7 @@ spec:
   storage:
     secret:
       type: s3
-      name: {{ .Values.minio.secretName }}
+      name: {{ .Values.s4.tempoSecretName }}
   template:
     distributor:
       tls:
