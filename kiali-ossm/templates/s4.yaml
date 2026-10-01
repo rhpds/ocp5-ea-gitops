@@ -157,3 +157,62 @@ stringData:
   endpoint: {{ .Values.s4.endpoint }}
   access_key_id: {{ .Values.s4.accessKeyId }}
   access_key_secret: {{ .Values.s4.accessKeySecret }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: s4-create-bucket
+  namespace: {{ .Values.tempo.namespace }}
+  labels:
+    app: s4
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    metadata:
+      labels:
+        app: s4-create-bucket
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: create-bucket
+        image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          python3 -c "
+          import urllib.request, urllib.error, hashlib, hmac, base64
+          from datetime import datetime
+          access_key = '{{ .Values.s4.accessKeyId }}'
+          secret_key = '{{ .Values.s4.accessKeySecret }}'
+          endpoint = 'http://s4:7480'
+          bucket = '{{ .Values.s4.bucketName }}'
+          date_str = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S +0000')
+          string_to_sign = f'PUT\n\n\n{date_str}\n/{bucket}'
+          sig = hmac.new(secret_key.encode(), string_to_sign.encode(), hashlib.sha1)
+          signature = base64.b64encode(sig.digest()).decode()
+          req = urllib.request.Request(f'{endpoint}/{bucket}', method='PUT')
+          req.add_header('Date', date_str)
+          req.add_header('Authorization', f'AWS {access_key}:{signature}')
+          try:
+              resp = urllib.request.urlopen(req)
+              print(f'Bucket {bucket} created: {resp.status}')
+          except urllib.error.HTTPError as e:
+              body = e.read().decode()
+              if 'BucketAlreadyExists' in body or 'BucketAlreadyOwnedByYou' in body:
+                  print(f'Bucket {bucket} already exists')
+              else:
+                  raise
+          "
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
