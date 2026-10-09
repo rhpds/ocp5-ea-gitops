@@ -65,14 +65,12 @@ data:
     #   execution: "execution-agent"
     #   verification: "verification-agent"
 
-    # Per-step tool overrides. When set, these replace the shared tools for that
-    # step on the AgenticRun (maps to spec.{analysis,execution,verification}.tools).
-    analysis:
-      tools:
-        skills:
-          - image: quay.io/openshiftanalytics/agentic-skills:latest
-            paths:
-              - /skills/cluster-troubleshoot/investigate-alert
+    # Shared skills for all workflow steps (maps to spec.tools on the AgenticRun).
+    tools:
+      skills:
+        - image: quay.io/openshiftanalytics/agentic-skills:latest
+          paths:
+            - /skills/cluster-troubleshoot/investigate-alert
     # execution:
     #   tools:
     #     skills:
